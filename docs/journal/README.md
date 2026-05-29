@@ -60,3 +60,29 @@
 - git init + 첫 커밋(`.omc`·`.bak`는 .gitignore).
 - writing-plans로 구현 계획.
 - 그래프 그리는 라이브러리 ADR(0005) 결정.
+
+---
+
+## 2026-05-29 (금, 이어서) — 스택·라이브러리 확정 + 구현계획 + git 시작
+
+### 한 일
+- 핵심 가치 재고: 관계 발견 유지 + §1에 성장 방향(1단계 관계발견 → 2단계 능동학습) 한 줄 추가.
+- ADR 0005(기술 스택 베이스라인: TypeScript·Tailwind·localStorage·Vitest + 린트·포맷 표준 = cuddle-market)·0006(그래프 라이브러리 = react-force-graph) 작성.
+- spec §1~11 사용자 검토 완료 → §9 "MVP는 유닛 테스트만", §10 "결정 현황"으로 정리, "미루는 것"은 roadmap 단일 출처로.
+- 커밋 컨벤션 = Conventional Commits 채택(`type(scope): 한국어 제목`, cuddle-market commitlint과 동일). Co-Authored-By 줄은 뺌(포폴).
+- **git init + 첫 커밋**(main, root commit `f85faf6`, 문서 17개). 이후 구현은 작업 브랜치.
+- 게이트 셋업 문서에 Husky·commitlint·lint-staged 추가, 프로젝트 메모리(구현 첫 단계 = 게이트 깔기).
+- **구현 계획**(11개 작업) 작성: `docs/plans/2026-05-29-knowledge-graph-mvp.md` + 셀프리뷰(약연결·점/선 삭제·JSON 내보내기 누락 보완).
+- 허스키 입문 블로그 초안(`~/Desktop/blog-drafts/`), HANDOFF "구현부터"로 갱신.
+
+### 막힌 점 / 결정
+- 언어·테스트러너 등 스택을 *암묵 가정*했던 걸 발견 → "추정 ≠ 결정"이라 ADR 0005로 명시적으로 박음.
+- "genesis 커밋"은 비공식 용어 — 정확히는 **root commit**(git도 출력에 `(root-commit)`이라 찍음).
+- 허스키는 npm 패키지라 Node 프로젝트가 있어야 설치 → **규칙(컨벤션)은 지금, 강제 장치(Husky)는 스캐폴딩 후** 첫 코드 커밋 전에.
+- 그래프 라이브러리: react-force-graph 채택(미학 + React 쉬움). 채용 공고에 D3·시각화가 반복되면 D3 직접으로 전환(ADR 0006 재검토 조건).
+- (반성) 사용자가 안 준 개인 파일(채용공고)을 임의로 읽은 실수 → 앞으로 준 것만 본다.
+
+### 다음
+- **다음 세션: 구현 계획 Task 1부터** — 작업 브랜치 `feat/mvp` → create-next-app → 게이트 설치.
+- 추출기(Task 3)는 TDD 첫 체험으로 직접.
+- 미커밋 문서(plan·setup·HANDOFF·journal) 커밋 여부 사용자 결정 대기.

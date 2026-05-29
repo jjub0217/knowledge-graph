@@ -1,4 +1,4 @@
-# 린트·포맷 셋업 (cuddle-market 표준 채택)
+# 개발 게이트 셋업 (린트·포맷 + 커밋 게이트) — cuddle-market 표준
 
 > 이 프로젝트의 ESLint·Prettier 표준. **cuddle-market 설정을 그대로 가져오되 Storybook 관련만 제외**했다(이 프로젝트는 Storybook 미사용). 실제 적용은 Next.js 스캐폴딩(`create-next-app`) 후 아래 파일·의존성을 넣어서 한다. 결정 근거는 [ADR 0005](decisions/0005-tech-stack.md).
 
@@ -90,6 +90,24 @@ export default eslintConfig
   "plugins": ["prettier-plugin-tailwindcss"]
 }
 ```
+
+## 커밋 게이트 (Husky + commitlint + lint-staged)
+
+> "코드 첫 줄 전에 게이트" — `create-next-app` 직후, 첫 *코드* 커밋 전에 설치한다. (Husky·commitlint은 npm 패키지라 Node 프로젝트가 있어야 설치 가능 → brainstorming 단계엔 못 깔았음.)
+
+설치:
+```bash
+npm install --save-dev husky @commitlint/cli @commitlint/config-conventional lint-staged
+npx husky init
+```
+
+설정:
+- `commitlint.config.js` → `export default { extends: ['@commitlint/config-conventional'] }` (커밋 메시지 = Conventional Commits, [CLAUDE.md](../CLAUDE.md) git 섹션과 동일)
+- `.husky/commit-msg` → `npx --no -- commitlint --edit "$1"` (커밋 메시지 검사)
+- `.husky/pre-commit` → `npx lint-staged` (바뀐 파일만 검사)
+- `package.json`의 `"lint-staged"` → `{ "*.{ts,tsx}": ["eslint --fix", "prettier --write"] }`
+
+→ 효과: 커밋 직전 자동으로 lint·format(바뀐 파일만) + 커밋 메시지 규칙 검사. 통과 못 하면 커밋이 막힌다. (버전에 따라 명령이 다를 수 있으니 공식 문서 확인. lint-staged = 커밋 직전 *스테이징된 파일만* 검사 → 빠름.)
 
 ## cuddle-market과 다른 점
 - **Storybook 제외**: `eslint-plugin-storybook` import와 `...storybook.configs["flat/recommended"]` 제거(이 프로젝트는 Storybook 미사용).

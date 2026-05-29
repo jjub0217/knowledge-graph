@@ -31,12 +31,12 @@
 
 ## 현재 단계
 
-- brainstorming 진행 중. 프로젝트 선정·면접 산출물 결정 완료.
-- **다음**: 설계 명확화 질문 (데이터 소스 → 노드/엣지 정의 → 자동/수동 → 핵심 가치 → MVP 범위). 상세는 `docs/HANDOFF.md` 7번.
+- **설계·구현 계획 완료** (brainstorming → spec → plan). 다음은 **구현**.
+- **다음**: 구현 계획 `docs/plans/2026-05-29-knowledge-graph-mvp.md`의 Task 1부터(작업 브랜치 `feat/mvp`). 상세는 `docs/HANDOFF.md` 7번.
 
-## 기술 스택 (미정 — 설계 시 ADR로 결정)
+## 기술 스택 (확정 — ADR 참조)
 
-- Next.js·React·TypeScript·Tailwind (사용자 주력) 추정. 그래프 시각화 라이브러리(D3 / react-force-graph / Cytoscape 등)는 첫 ADR로 비교 후 결정.
+- Next.js 16 · React 19 · TypeScript 5 · Tailwind 4 · Vitest 4 · react-force-graph · zustand. (근거: ADR 0003·0005·0006)
 
 ## git
 

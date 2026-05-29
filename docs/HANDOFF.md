@@ -115,32 +115,27 @@
 
 ## 7. 현재 상태 / 다음 단계 ★
 
-### 완료
-- [x] 프로젝트 선정 (J. 학습 지식 그래프)
-- [x] 동기·메타 요구사항(면접 설명력) 합의
-- [x] 면접 산출물 6종 채택 결정
-- [x] 경로 전환(하이브리드) + 새 폴더 세팅 + 메모리 복사
-- [x] 후보 비교 문서 (`docs/brainstorm/2026-05-27-new-project-candidates.md`)
-- [x] 면접 산출물 스켈레톤 (`docs/decisions/`, `docs/journal/`, `docs/interview-prep.md`)
-- [x] 프로젝트 `CLAUDE.md` 생성 (세션 시작 시 자동 로드 → 이 문서를 가리킴)
+> **2026-05-29 기준: brainstorming → spec → 구현 계획까지 전부 완료.** 다음 세션은 **구현부터** 시작.
 
-### 아직 안 한 것 = 다음 세션 시작점
-- [ ] **지식 그래프 설계 명확화 질문** (brainstorming 스킬 계속) — 한 번에 한 질문씩:
-  1. **데이터 소스**: 주간 학습 로그(`~/Desktop/weekly-learning-log.md`) 한 파일? 블로그도? 수동 입력? 무엇이 그래프를 채우나?
-  2. **노드·엣지 정의**: 노드 = 개념? 키워드? 글 1편? / 엣지 = 무슨 관계(선후·유사·인용)?
-  3. **관계 생성 방식**: 자동 추출(키워드) vs 수동 연결 vs 하이브리드
-  4. **핵심 가치**: 회고(뭘 배웠나)? 학습 추천(다음 뭐)? 관계 발견? 공유/포폴?
-  5. **MVP 범위**: 1차로 어디까지?
-- [ ] 2~3개 접근법 제안 (트레이드오프)
-- [ ] 설계(spec) 제시 → 사용자 승인
-- [ ] 설계 문서 작성: `docs/superpowers/specs/2026-MM-DD-knowledge-graph-design.md` + 커밋
-- [ ] spec self-review → 사용자 리뷰
-- [ ] writing-plans 스킬로 구현 계획 작성
+### 완료 (설계 단계 전부)
+- [x] 설계 명확화: 핵심가치=**관계 발견**, 노드=개념/키워드(평면, 주제=색), 엣지="관련" 무방향(수동), 소스=하이브리드(학습 로그 .md 업로드 + velog 글 URL)
+- [x] **ADR 0001~0006** (`docs/decisions/`): 노드입도 · 노드출처(섞기) · Next.js · velog(GraphQL+서버라우트) · 스택(TS·Tailwind·localStorage·Vitest) · 그래프 라이브러리(react-force-graph)
+- [x] **설계 문서(spec)** 작성·검토: `docs/specs/2026-05-29-knowledge-graph-design.md`
+- [x] roadmap 단일출처(`docs/roadmap.md`) · interview-prep · 빌드 저널 · 주간 학습 로그 갱신
+- [x] `/journal` 프로젝트 스킬(`.claude/skills/journal/`) · 게이트 셋업 문서(`docs/setup-lint-format.md`)
+- [x] OMC 플러그인 비활성화(Claude Code 네이티브 학습), statusLine 제거
+- [x] git init + 첫 커밋(main, `f85faf6`). 커밋 컨벤션=Conventional Commits, 구현은 작업 브랜치
+- [x] **구현 계획** 작성: `docs/plans/2026-05-29-knowledge-graph-mvp.md` (11개 작업)
 
-### 기술 스택 (미정 — 설계 시 ADR로 결정)
-- 프레임워크: Next.js 추정(사용자 주력) — 미확정
-- 그래프 시각화: D3 / react-force-graph / Cytoscape / vis-network 등 비교 필요 → **첫 ADR 후보**
-- 사용자 환경: Next.js·React·TypeScript·Tailwind·Supabase·Prisma 경험 보유
+### 다음 세션 시작점 = 구현 ★
+- **`docs/plans/2026-05-29-knowledge-graph-mvp.md`의 Task 1부터** 실행.
+- Task 1 = 작업 브랜치(`feat/mvp`) → `create-next-app` → 게이트 설치(eslint/prettier·husky·commitlint·lint-staged, 상세 `docs/setup-lint-format.md`).
+- 실행 방식: writing-plans의 execution handoff(서브에이전트 구동 추천 / 인라인) 중 선택.
+- ⭐ **추출기(Task 3)는 TDD 첫 체험** — 사용자가 직접 RED→GREEN→REFACTOR.
+- 메모리 `project_setup_gate_step.md` 참고(구현 첫 단계 = 게이트 깔기).
+
+### 기술 스택 (확정 — ADR 참조)
+- Next.js 16 · React 19 · TypeScript 5 · Tailwind 4 · Vitest 4 · react-force-graph · zustand (ADR 0003·0005·0006).
 
 ---
 
@@ -152,8 +147,8 @@ cd ~/Desktop/knowledge-graph
 claude
 ```
 이제 프로젝트 `CLAUDE.md`가 자동 로드되며 "세션 시작 시 docs/HANDOFF.md 먼저 읽어라"라고 지시함. 따라서 첫 메시지는 간단히:
-> **"이어서 진행해줘"** (또는 "설계 명확화 질문부터 시작해줘")
+> **"이어서 진행해줘"** (또는 "구현 계획 Task 1부터 시작해줘")
 
-Claude는 CLAUDE.md 지시에 따라 이 문서를 읽고 "7. 다음 단계"의 설계 명확화 질문부터 시작한다.
+Claude는 CLAUDE.md 지시에 따라 이 문서를 읽고 "7. 다음 단계"의 **구현**(`docs/plans/2026-05-29-knowledge-graph-mvp.md`의 Task 1)부터 시작한다.
 
-(선택) git 초기화는 새 세션에서: `git init` → 스캐폴드 첫 커밋.
+(git은 이미 초기화·첫 커밋 완료. 구현은 작업 브랜치 `feat/mvp`에서.)
