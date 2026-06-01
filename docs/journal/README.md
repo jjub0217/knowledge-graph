@@ -111,3 +111,27 @@
 - GREEN 2~5단계로 추출기 완성(제목·코드·볼드·중복 제거) → REFACTOR → 커밋.
 - 구현 계획 Task 4~11 이어서.
 - MVP 마무리 때 GitHub 셋업 + **ADR 0007**(커밋/이슈/PR/브랜치 워크플로우).
+
+---
+
+## 2026-06-01 (월) — 로직 절반 완성: 추출기·저장소·그래프연산·스토어·velog 라우트
+
+### 한 일
+- **Task 3 추출기 완성**: GREEN 3~5단계(코드·볼드 추출, 중복 제거) → 5개 테스트 통과 → 커밋 `3f38fa3`. **첫 TDD 사이클 완주**(RED→GREEN→커밋).
+- **Task 4 저장소(TDD)**: `saveGraph·loadGraph·exportJSON·importJSON`(localStorage + JSON). 3개 통과 → `64bf29c`.
+- **Task 5 그래프 연산 + 상태**: `degree·isIsolated`(TDD, 2개) + zustand 스토어(`graph-store.ts`, 점·선 보관/추가/삭제). zustand 설치 → `5f64020`.
+- **Task 6 velog 라우트**: `parseVelogUrl`(TDD, 2개) + `fetchVelogMarkdown`(내장 fetch + velog GraphQL) + 서버 라우트(`app/api/velog/route.ts`). **실제 velog 글을 curl로 가져와 검증 성공** → `1dcb2b0`.
+- 도구·문서: `commit-push` 스킬(커밋 전용, 우리 컨벤션) 생성 · `learn-log` 스킬 복사 · 주간 학습 로그 갱신 · spec **§7.1 디렉토리 구조와 역할** 추가 · ADR 0005에 **fetch 결정** 보강.
+
+### 막힌 점 / 결정
+- **(디버깅) Next.js 라우트 파일명**: `routes.ts`(복수)로 만들어 `/api/velog`가 안 잡힘 → POST가 JSON 대신 **HTML(404)** 을 돌려줌. 원인 = 파일명. Next 라우트 파일은 반드시 **`route.ts`(단수)**. (증상 HTML → 좁히기 "라우트 못 찾음" → 원인 파일명 → 고침)
+- **HTTP 클라이언트 = 내장 `fetch`(axios 미사용)** → ADR 0005 보강. 근거: 의존성 0·서버/클라이언트 동일 동작·Next 캐싱 궁합 ↔ axios의 자동 JSON·인터셉터 포기.
+- **`NextResponse` vs 표준 `Response`**: 표준으로도 되지만 Next 관례 + 쿠키·리다이렉트 확장 여지로 NextResponse(코드 주석으로 근거 기록). `Request`는 **전역 타입**이라 import 불필요(NextRequest는 `.json()`만 쓰면 돼서 미사용).
+- **중복 제거 = `Set` vs 배열+`includes`**: 동작 동일, 데이터 적으면 배열로 충분 → 사용자가 Set 생소해 배열 채택.
+- **디렉토리 역할 문서화**: `lib`(순수 로직)·`components`(UI)·`app`(페이지·라우트) 분리를 spec §7.1로 남김(면접 "아키텍처 설명"용).
+- **(반성) 읽기 좋은 식별자**: `r`·`c`·`u`·`s` 같은 축약을 반복해서 써 지적받음 → 코드 제시 **전에** 미리 의미 있는 이름으로 바꾸기로(메모리 기록). 단 `res`·`req` 같은 관용 축약은 유지.
+
+### 다음
+- **Task 7 InputPanel**부터 **UI 구간**(`components` + `app/page.tsx`). TDD 아니라 `npm run dev`로 **눈으로 수동 검증**.
+- Task 9에서 **react-force-graph** 처음 등장(그래프 그리기).
+- MVP 마무리 때 GitHub 셋업 + ADR 0007.
