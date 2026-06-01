@@ -135,3 +135,28 @@
 - **Task 7 InputPanel**부터 **UI 구간**(`components` + `app/page.tsx`). TDD 아니라 `npm run dev`로 **눈으로 수동 검증**.
 - Task 9에서 **react-force-graph** 처음 등장(그래프 그리기).
 - MVP 마무리 때 GitHub 셋업 + ADR 0007.
+
+---
+
+## 2026-06-01 (월, 이어서) — GitHub 공개 + 워크플로 컨벤션 + Kimi 코드리뷰 결정 + 토대 머지
+
+### 한 일
+- **GitHub 공개 저장소 생성**(`jjub0217/knowledge-graph`, public) + `main`·`feat/mvp` 푸시. (원래 "MVP 마무리 때"였으나, Kimi 코드리뷰를 붙이려고 앞당김)
+- **워크플로 컨벤션 정립**: **ADR 0007** + `docs/conventions.md`(브랜치·커밋·PR·코드/파일 네이밍·git 워크플로) + **`create-issue` 스킬**(이슈+브랜치) + **`commit-push` 확장**(커밋→푸시→PR). cuddle-market `conventions.md` 참고하되 우리에 맞게 각색.
+- **PR 템플릿에 "동작 확인"(스크린샷+수동 검증) 섹션** 추가 — UI는 자동 테스트가 시각적 부분을 못 덮으니 사람이 확인한 기록을 남기려고.
+- **토대(Task 1~6 + 모든 문서)를 PR #1로 `main`에 머지** → `feat/mvp` 로컬·원격 삭제(정리).
+- 블로그 초안 "AI 코드리뷰 도구, 무엇으로 고를까" 작성(`~/Desktop/blog-drafts/`).
+
+### 막힌 점 / 결정
+- **(재설계) 단일 브랜치의 함정**: `feat/mvp` 한 브랜치에 다 쌓으면 PR 하나가 거대 → **Kimi 코드리뷰가 읽을 diff가 커져 토큰 폭발**. → 토대(테스트됨)는 큰 PR 하나로 머지(Kimi 스킵), **UI(Task 7)부터 task별 작은 PR마다 Kimi**.
+- **브랜치 컨벤션**: cuddle-market의 `feature/24--이름`(이중 대시 `--`)는 비표준(웹 조사) → **`feat/N-설명`(단일 하이픈)**. `develop` 없이 **main 단일**(솔로). 커밋 type은 **표준 11개만**(커스텀 design·init 등 금지 — 우리 commitlint이 차단).
+- **Kimi vs Claude = 비용**: cuddle-market이 Claude 리뷰($0.10~0.50/PR, 문서 확인)에서 Kimi로 갈아탄 게 비용 때문. 우리도 Kimi 채택. 모델 = **K2.6**(레거시 K2는 2026-05-25 EOL).
+- **OpenRouter(편의점) vs Moonshot 직접(로스터)**: Kimi를 부르는 두 길. cuddle-market은 OpenRouter였는데 **"왜"는 어디에도 기록이 없음**(주간로그·세션 모두 검색) → **"결정은 기록해야 안 사라진다"는 산 증거**. 우리는 OpenRouter 재사용 채택 + **ADR 0008로 남길 예정**.
+- **(실수) Kimi 워크플로를 PR #1 브랜치에 넣어** PR #1에서 트리거·실패함 → 제거(Kimi는 Task 7부터). `mergeStateStatus`로 진단.
+- **(보안)** API 키는 채팅·코드·워크플로 파일에 직접 쓰지 않고 **GitHub Secret(`OPENROUTER_API_KEY`)으로만** 참조.
+- **(반성) "내가 머지"의 뜻**: 사용자가 GitHub PR 본문+Kimi 리뷰 확인→머지 버튼을 의미했는데, 로컬 머지 명령을 안내한 실수 → PR 생성 흐름으로 정정.
+
+### 다음
+- **ADR 0008**(Kimi·OpenRouter·커스텀 워크플로 결정) 작성 + OpenRouter Kimi 워크플로 생성.
+- **Task 7(InputPanel)부터 정석 흐름**: 이슈 → 브랜치(`feat/N-...`) → 코딩 → 커밋·푸시 → PR → **Kimi 자동 리뷰** → 사용자 머지.
+- Kimi 셋업을 별도 PR로 먼저 vs Task 7 PR에 묶기 — 사용자 결정 대기.
