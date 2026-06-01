@@ -41,5 +41,6 @@
 ## git
 
 - main 직접 커밋 금지, 작업 브랜치 → PR. 머지는 사용자가 직접 수행. (단 저장소 첫(root) 커밋은 base가 없으므로 main에 둠 — 이후 구현 작업부터 작업 브랜치.)
-- **커밋 메시지 = Conventional Commits** (`type(scope): 한국어 제목`). type: `feat·fix·docs·style·refactor·perf·test·build·ci·chore·revert` (= `@commitlint/config-conventional` 표준, cuddle-market과 동일). 커스텀 type 만들지 않음. scope는 선택(예: extractor·graph·velog).
+- **커밋 메시지 = Conventional Commits** (`type: 한국어 제목 (#이슈번호)`). type: `feat·fix·docs·style·refactor·perf·test·build·ci·chore·revert` (= `@commitlint/config-conventional` 표준, cuddle-market과 동일). 커스텀 type 만들지 않음. **scope는 쓰지 않음**(2026-05-31 결정 — 구현 계획서에 적힌 scope는 빼고 커밋).
+  - **이슈 번호**: 제목 끝에 `(#번호)`로 붙임 (예: `feat: 로그인 ui 작업(#32)`). 단 GitHub 저장소·이슈는 **MVP 마무리/배포 단계에 셋업**(2026-05-31 결정 B) → 그 전 커밋엔 번호를 붙이지 않음.
 - 커밋 메시지에 `Co-Authored-By` 줄은 넣지 않음(포폴 — 온전히 본인 작업으로).

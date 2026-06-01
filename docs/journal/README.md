@@ -86,3 +86,52 @@
 - **다음 세션: 구현 계획 Task 1부터** — 작업 브랜치 `feat/mvp` → create-next-app → 게이트 설치.
 - 추출기(Task 3)는 TDD 첫 체험으로 직접.
 - 미커밋 문서(plan·setup·HANDOFF·journal) 커밋 여부 사용자 결정 대기.
+
+---
+
+## 2026-05-31 (일) — 구현 시작: 셋업·게이트·타입 + 추출기 TDD 첫 체험
+
+### 한 일
+- **Task 1 (셋업 + 게이트)**: 작업 브랜치 `feat/mvp` 생성, `create-next-app`으로 스캐폴딩(기본 뼈대 자동 생성) — Next 16.2.6·React 19.2.4·Tailwind 4·TS 5. 게이트(커밋 전 자동 검사 장치) 설치: ESLint·Prettier·Husky·commitlint·lint-staged + Vitest 설정. 커밋 `1a44cd0`.
+- **Task 2 (공유 타입)**: `Candidate·GraphNode·GraphEdge·Graph` 타입 정의(`src/lib/types.ts`). 커밋 `fa203e6`.
+- **Task 3 (추출기) — TDD 첫 체험 진행 중**: 테스트 5개를 주석 가득 달아 먼저 작성(RED), 사용자가 IDE 터미널에서 **직접 실패를 눈으로 확인**. GREEN을 직접 타이핑으로: 1단계 빈 껍데기(`return []`)로 1개 통과 → 2단계 제목 뽑기 진행 중.
+- statusLine(하단 상태 줄: 폴더·브랜치·모델·컨텍스트 바) 설정.
+- velog 글 "헷갈리는 개발 용어 정리"에 **TDD 섹션** 추가(직접 게시).
+
+### 막힌 점 / 결정
+- `create-next-app .`이 비어있지 않은 폴더(특히 `CLAUDE.md`)를 충돌로 거부 → **임시 폴더에 만든 뒤 옮기고** `.gitignore` 병합(진짜 `CLAUDE.md` 보존).
+- 구현 계획 Task 1에 ESLint/Prettier 의존성이 누락된 걸 발견 → `setup-lint-format.md`대로 추가 설치.
+- commitlint **`subject-case` 규칙**: 제목이 대문자 식별자(PascalCase, 예 `Candidate`)로 시작하면 막힘 → 계획서의 커밋 메시지 예시 자체가 걸려서 **한국어 제목으로** 바꿔 통과. (살아있는 트러블슈팅 사례)
+- `commitlint.config.js` → **`.mjs`**로 변경(매 커밋 ESM 경고 제거).
+- **커밋 컨벤션 변경**: scope를 **쓰지 않기로**(`type: 제목`만). 이슈 번호 `(#N)`은 **형식만 합의**, GitHub 저장소·이슈는 **MVP 마무리 때 셋업**한 뒤부터 적용(결정 B). 이슈 본문·PR·브랜치 네이밍 컨벤션은 서로 엮여 있어 그때 **묶어서 ADR 0007**로 결정.
+- `commitlint.config.mjs`에 type을 8개로 줄인 오버라이드가 작업 트리에 있어(표준 11개와 충돌) → **표준으로 복구**(결정 A).
+- (반성) **"내 눈으로 직접 확인"을 클로드가 대신 실행해 결과만 전달한 실수** → 학습·체험 단계에선 클로드가 돌리지 말고 **명령만 주고 사용자가 직접 실행**하도록(메모리 기록).
+
+### 다음
+- GREEN 2~5단계로 추출기 완성(제목·코드·볼드·중복 제거) → REFACTOR → 커밋.
+- 구현 계획 Task 4~11 이어서.
+- MVP 마무리 때 GitHub 셋업 + **ADR 0007**(커밋/이슈/PR/브랜치 워크플로우).
+
+---
+
+## 2026-06-01 (월) — 로직 절반 완성: 추출기·저장소·그래프연산·스토어·velog 라우트
+
+### 한 일
+- **Task 3 추출기 완성**: GREEN 3~5단계(코드·볼드 추출, 중복 제거) → 5개 테스트 통과 → 커밋 `3f38fa3`. **첫 TDD 사이클 완주**(RED→GREEN→커밋).
+- **Task 4 저장소(TDD)**: `saveGraph·loadGraph·exportJSON·importJSON`(localStorage + JSON). 3개 통과 → `64bf29c`.
+- **Task 5 그래프 연산 + 상태**: `degree·isIsolated`(TDD, 2개) + zustand 스토어(`graph-store.ts`, 점·선 보관/추가/삭제). zustand 설치 → `5f64020`.
+- **Task 6 velog 라우트**: `parseVelogUrl`(TDD, 2개) + `fetchVelogMarkdown`(내장 fetch + velog GraphQL) + 서버 라우트(`app/api/velog/route.ts`). **실제 velog 글을 curl로 가져와 검증 성공** → `1dcb2b0`.
+- 도구·문서: `commit-push` 스킬(커밋 전용, 우리 컨벤션) 생성 · `learn-log` 스킬 복사 · 주간 학습 로그 갱신 · spec **§7.1 디렉토리 구조와 역할** 추가 · ADR 0005에 **fetch 결정** 보강.
+
+### 막힌 점 / 결정
+- **(디버깅) Next.js 라우트 파일명**: `routes.ts`(복수)로 만들어 `/api/velog`가 안 잡힘 → POST가 JSON 대신 **HTML(404)** 을 돌려줌. 원인 = 파일명. Next 라우트 파일은 반드시 **`route.ts`(단수)**. (증상 HTML → 좁히기 "라우트 못 찾음" → 원인 파일명 → 고침)
+- **HTTP 클라이언트 = 내장 `fetch`(axios 미사용)** → ADR 0005 보강. 근거: 의존성 0·서버/클라이언트 동일 동작·Next 캐싱 궁합 ↔ axios의 자동 JSON·인터셉터 포기.
+- **`NextResponse` vs 표준 `Response`**: 표준으로도 되지만 Next 관례 + 쿠키·리다이렉트 확장 여지로 NextResponse(코드 주석으로 근거 기록). `Request`는 **전역 타입**이라 import 불필요(NextRequest는 `.json()`만 쓰면 돼서 미사용).
+- **중복 제거 = `Set` vs 배열+`includes`**: 동작 동일, 데이터 적으면 배열로 충분 → 사용자가 Set 생소해 배열 채택.
+- **디렉토리 역할 문서화**: `lib`(순수 로직)·`components`(UI)·`app`(페이지·라우트) 분리를 spec §7.1로 남김(면접 "아키텍처 설명"용).
+- **(반성) 읽기 좋은 식별자**: `r`·`c`·`u`·`s` 같은 축약을 반복해서 써 지적받음 → 코드 제시 **전에** 미리 의미 있는 이름으로 바꾸기로(메모리 기록). 단 `res`·`req` 같은 관용 축약은 유지.
+
+### 다음
+- **Task 7 InputPanel**부터 **UI 구간**(`components` + `app/page.tsx`). TDD 아니라 `npm run dev`로 **눈으로 수동 검증**.
+- Task 9에서 **react-force-graph** 처음 등장(그래프 그리기).
+- MVP 마무리 때 GitHub 셋업 + ADR 0007.

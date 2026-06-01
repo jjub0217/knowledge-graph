@@ -24,3 +24,11 @@ coverage/
 .DS_Store
 *.log
 npm-debug.log*
+
+# Next.js / TypeScript 자동 생성
+next-env.d.ts
+*.tsbuildinfo
+
+# 인증서 / 배포
+*.pem
+.vercel
