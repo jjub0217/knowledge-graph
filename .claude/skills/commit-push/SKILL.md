@@ -1,21 +1,21 @@
 ---
 name: commit-push
-description: 변경사항을 분석해 Conventional Commits 메시지로 커밋한다. "/commit-push", "커밋", "커밋해줘", "커밋 푸시" 요청에 사용. (현재 범위 = 커밋까지만. 푸시·PR·이슈 연동은 GitHub 셋업 후 ADR 0007로 확장)
+description: 변경사항을 분석해 Conventional Commits 메시지로 커밋한다. "/commit-push", "커밋", "커밋해줘", "커밋 푸시" 요청에 사용. (현재 범위 = 커밋까지만. 이슈→브랜치→PR 흐름은 MVP 마무리 후 적용 — ADR 0007·conventions.md)
 ---
 
 # commit-push (현재 단계: 커밋까지만)
 
 작업 완료 후 변경사항을 분석해 커밋한다.
 
-> **현재 범위 안내**: 이 프로젝트는 아직 원격(GitHub)·이슈가 없어 **커밋까지만** 수행한다. 푸시·PR 생성·이슈 번호 연동은 MVP 마무리 때 GitHub를 올리며 **ADR 0007**(커밋/이슈/PR/브랜치 워크플로우)로 확장한다. 그 전까지 이 스킬에서 push·PR 단계는 실행하지 않는다.
+> **현재 범위 안내**: GitHub 저장소(`jjub0217/knowledge-graph`)·[ADR 0007](../../../docs/decisions/0007-workflow-conventions.md)은 이미 셋업·확정됐다. 단 MVP는 `feat/mvp` 한 브랜치로 진행하므로(이전 작업과 일관) 이 스킬은 당분간 **커밋까지만** 수행한다. 이슈→브랜치→PR 흐름은 **MVP 마무리 이후** 새 작업부터 적용한다.
 
 ## 커밋 컨벤션 (이 프로젝트)
 
-출처: [CLAUDE.md](../../../CLAUDE.md) git 섹션 + commitlint(`@commitlint/config-conventional` 표준).
+전체 워크플로우 컨벤션 = [docs/conventions.md](../../../docs/conventions.md) (브랜치·커밋·PR·네이밍, 단일 출처). 출처: 그 문서 + commitlint(`@commitlint/config-conventional`). 아래는 커밋 핵심 요약.
 
 - 형식: **`type: 한국어 제목`**
 - **scope 안 씀** (괄호 scope 금지) — 2026-05-31 결정
-- **이슈 번호 `(#N)`은 아직 안 붙임** — GitHub 셋업 후부터(결정 B)
+- **이슈 번호 `(#N)`은 MVP 동안 안 붙임** — MVP 마무리 후 이슈/PR 흐름부터(ADR 0007)
 - **type은 표준 11개만**: `feat·fix·docs·style·refactor·perf·test·build·ci·chore·revert`. **커스텀 타입 금지**(design·init·rename·remove 등 ❌ — commitlint이 막음).
 - 제목 규칙: 한국어로, **대문자 식별자(PascalCase)로 시작 금지**(subject-case), **끝에 마침표 금지**, 첫 줄 100자 이내.
 - **Co-Authored-By 줄 넣지 않음** (포트폴리오 — 본인 작업).
@@ -73,10 +73,9 @@ git commit -m "type: 한국어 제목"
 - **커스텀 커밋 타입 금지** (표준 11개만).
 - **게이트 우회(`--no-verify`) 금지.**
 
-## 나중에 (ADR 0007에서 확장 예정)
+## 나중에 (push/PR — MVP 마무리 후)
 
-GitHub 저장소·원격·이슈를 올린 뒤 이 스킬에 추가한다:
-- 이슈 번호 `(#N)`를 제목 끝에 붙이기
-- `git push`(첫 푸시는 `-u`)
-- `gh pr create`(base = `main`)로 PR 생성 + PR 템플릿
-- 이슈 자동 close(`Closes #N`)
+브랜치·PR·이슈 컨벤션은 [ADR 0007](../../../docs/decisions/0007-workflow-conventions.md)·[conventions.md](../../../docs/conventions.md)로 확정됨. 단 실제 적용(이슈→브랜치→PR)은 **MVP 마무리 이후** 새 작업부터. 그때 이 스킬에 추가:
+- 커밋 제목에 이슈 번호 `(#N)` 붙이기
+- `git push`(첫 푸시 `-u`)
+- `gh pr create`(base `main`, conventions.md의 PR 템플릿) + `Closes #N`
