@@ -13,6 +13,7 @@
 | [0005](0005-tech-stack.md) | 기술 스택 베이스라인 = TS·Tailwind·localStorage·Vitest | 채택 | 2026-05-29 |
 | [0006](0006-graph-library.md) | 그래프 그리는 라이브러리 = react-force-graph | 채택 | 2026-05-29 |
 | [0007](0007-workflow-conventions.md) | 워크플로우 컨벤션 = 브랜치·커밋·PR·이슈·네이밍 | 채택 | 2026-06-01 |
+| [0008](0008-code-review-tool.md) | 코드리뷰 도구 = Kimi(K2.6)·OpenRouter·커스텀 워크플로 | 채택 | 2026-06-01 |
 
 ---
 
