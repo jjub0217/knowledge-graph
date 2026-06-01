@@ -38,7 +38,7 @@ description: 변경사항을 커밋 → 푸시 → PR 생성한다. "/commit-pus
 - 기존 PR 확인: `gh pr list --head 브랜치 --state open` → 있으면 건너뜀.
 - 없으면 확인 후 생성(base **main**, conventions.md §3 템플릿):
   gh pr create --base main --title "타입: 내용" --body "..."
-  본문 = 개요 / 작업 내용 / 관련 이슈(`Closes #N` 단독 라인) / 리뷰어 참고. 제목엔 `(#N)` 생략.
+  본문 = 개요 / 작업 내용 / **동작 확인(스크린샷+수동 검증, UI 변경 시)** / 관련 이슈(`Closes #N` 단독 라인) / 리뷰어 참고. 제목엔 `(#N)` 생략.
 
 ### Step 6: 완료 안내
 이슈·브랜치·PR URL 표시 + "PR에서 Kimi 리뷰 확인 → (수정) → 머지 버튼은 직접" 안내.

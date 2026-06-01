@@ -1,0 +1,19 @@
+name: Kimi Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize] # PR 생성·새 커밋 푸시 시 자동 리뷰
+
+permissions:
+  contents: read
+  pull-requests: write # PR에 리뷰 코멘트 작성
+  checks: write # 인라인 주석(Checks API)
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: howardpen9/kimi-code-reviewer@main
+        with:
+          kimi_api_key: ${{ secrets.MOONSHOT_API_KEY }}
