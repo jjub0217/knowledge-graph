@@ -1,7 +1,7 @@
 # 컨벤션 (knowledge-graph)
 
 > cuddle-market `conventions.md`를 기반으로 이 프로젝트(솔로·표준 게이트)에 맞게 각색. 결정 근거는 [ADR 0007](decisions/0007-workflow-conventions.md).
-> **적용 시점**: 문서는 지금 확정. 강제 적용은 MVP 마무리 이후 — 현재는 `feat/mvp` 한 브랜치로 MVP까지 진행(이전 작업과 일관). 이후 새 작업부터 아래 이슈→브랜치→PR 흐름을 적용한다.
+> **적용 시점**: 문서는 지금 확정. 강제 적용은 **토대(Task 1~6) 이후 = UI(Task 7)부터**. 토대는 `feat/mvp` 단일 브랜치(PR #1)로 묶고, 이후 task마다 아래 이슈→브랜치→PR→Kimi 리뷰 흐름을 적용한다.
 
 ## 1. 브랜치 컨벤션
 
@@ -82,4 +82,4 @@ Closes #N
 - **main 직접 커밋 금지** → 작업 브랜치 → PR → 사용자 머지
 - 흐름: **이슈 생성 → 이슈번호로 브랜치(`feat/N-설명`) → 작업·커밋(`(#N)`) → PR(base `main`, `Closes #N`) → 사용자 머지**
 - `--no-verify`(게이트 우회)·force push 금지
-- **현재 MVP는 `feat/mvp` 한 브랜치로 진행**(이전 6개 task와 일관) → 위 이슈/PR 흐름은 **MVP 이후** 새 작업부터
+- **토대(Task 1~6)는 `feat/mvp` 단일 브랜치로 묶음**(PR #1) → 위 이슈/PR 흐름은 **UI(Task 7)부터** task마다 적용

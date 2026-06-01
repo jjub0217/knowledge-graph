@@ -1,81 +1,50 @@
 ---
 name: commit-push
-description: 변경사항을 분석해 Conventional Commits 메시지로 커밋한다. "/commit-push", "커밋", "커밋해줘", "커밋 푸시" 요청에 사용. (현재 범위 = 커밋까지만. 이슈→브랜치→PR 흐름은 MVP 마무리 후 적용 — ADR 0007·conventions.md)
+description: 변경사항을 커밋 → 푸시 → PR 생성한다. "/commit-push", "커밋", "커밋 푸시", "PR" 요청에 사용. 머지는 사용자가 직접.
 ---
 
-# commit-push (현재 단계: 커밋까지만)
+# commit-push — 커밋 → 푸시 → PR
 
-작업 완료 후 변경사항을 분석해 커밋한다.
+작업 완료 후 변경사항을 커밋하고, 푸시하고, PR을 생성한다. **머지는 사용자가 GitHub에서 직접 한다.**
 
-> **현재 범위 안내**: GitHub 저장소(`jjub0217/knowledge-graph`)·[ADR 0007](../../../docs/decisions/0007-workflow-conventions.md)은 이미 셋업·확정됐다. 단 MVP는 `feat/mvp` 한 브랜치로 진행하므로(이전 작업과 일관) 이 스킬은 당분간 **커밋까지만** 수행한다. 이슈→브랜치→PR 흐름은 **MVP 마무리 이후** 새 작업부터 적용한다.
+> 전체 컨벤션: [docs/conventions.md](../../../docs/conventions.md) (커밋 §2·PR §3·워크플로우 §6). 결정 근거: [ADR 0007](../../../docs/decisions/0007-workflow-conventions.md).
+> **적용 시점**: 토대(Task 1~6)는 `feat/mvp` 단일 브랜치(PR #1)로 끝냄. UI(Task 7)부터 정석 흐름(이슈→브랜치→코딩→커밋·푸시→PR→Kimi 리뷰→사용자 머지) 적용.
 
-## 커밋 컨벤션 (이 프로젝트)
-
-전체 워크플로우 컨벤션 = [docs/conventions.md](../../../docs/conventions.md) (브랜치·커밋·PR·네이밍, 단일 출처). 출처: 그 문서 + commitlint(`@commitlint/config-conventional`). 아래는 커밋 핵심 요약.
-
-- 형식: **`type: 한국어 제목`**
-- **scope 안 씀** (괄호 scope 금지) — 2026-05-31 결정
-- **이슈 번호 `(#N)`은 MVP 동안 안 붙임** — MVP 마무리 후 이슈/PR 흐름부터(ADR 0007)
-- **type은 표준 11개만**: `feat·fix·docs·style·refactor·perf·test·build·ci·chore·revert`. **커스텀 타입 금지**(design·init·rename·remove 등 ❌ — commitlint이 막음).
-- 제목 규칙: 한국어로, **대문자 식별자(PascalCase)로 시작 금지**(subject-case), **끝에 마침표 금지**, 첫 줄 100자 이내.
-- **Co-Authored-By 줄 넣지 않음** (포트폴리오 — 본인 작업).
+## 커밋 컨벤션 (요약 — 전체는 conventions.md §2)
+- 형식: `타입: 한국어 제목 (#이슈번호)` (이슈 기반 작업부터 `(#N)`)
+- scope 안 씀 / 타입 = 표준 11개만(커스텀 금지) / 제목 대문자 시작·끝 마침표 금지 / Co-Authored-By 없음
+- commitlint(commit-msg 훅)이 강제
 
 ## 작업 순서
 
 ### Step 0: 브랜치 확인
+`git branch --show-current` — **main이면 중단**: "main 직접 작업 금지. `/create-issue`로 이슈+브랜치 먼저." 안내 후 멈춤.
 
-```bash
-git branch --show-current
-```
-- **main 이면 중단**: "main 직접 커밋 금지. 작업 브랜치(`feat/...`)에서 진행하세요." 라고 안내하고 멈춘다.
+### Step 1: 변경 분석 (병렬)
+`git status` / `git diff` / `git log -5 --oneline`
+- 작업 타입·내용 파악, 민감·불필요 파일(.env*·.DS_Store·node_modules·.next) 제외 확인.
+- 현재 브랜치명에서 이슈 번호 추출(예: `feat/5-input-panel` → #5).
 
-### Step 1: 변경사항 분석 (병렬 실행)
-
-```bash
-git status
-git diff
-git log -5 --oneline
-```
-- 작업 타입(feat/fix/refactor/docs/chore 등) 파악, 무엇을·왜 바꿨는지 파악.
-- **민감·불필요 파일 제외 확인**: `.env*`, `credentials*`, `.DS_Store`, `node_modules`, `.next` 등.
-
-### Step 2: 커밋 메시지 제안 + 사용자 확인
-
-- `type: 한국어 제목` 형식으로 메시지를 제안한다 (scope·이슈번호 없이).
-- 사용자에게 **"이 메시지로 커밋할까요?"** 라고 메시지를 보여주고 확인받는다.
+### Step 2: 커밋 메시지 제안 + 확인
+`타입: 한국어 제목 (#N)` 제안 → "이 메시지로 커밋할까요?" 확인.
 
 ### Step 3: 스테이징 + 커밋
+관련 파일만 `git add` → `git commit -m "..."`. 게이트(pre-commit lint-staged·commit-msg commitlint) 통과. 막히면 사유 고쳐 재커밋. `--no-verify` 금지.
 
-- **관련 파일만** 스테이징한다 (`git add -A` 남발 금지, 의도한 파일만).
-```bash
-git add [파일들]
-git commit -m "type: 한국어 제목"
-```
-- 커밋 시 게이트가 돈다: **pre-commit**(lint-staged: 바뀐 파일만 eslint --fix + prettier --write) → **commit-msg**(commitlint: 메시지 규칙).
-- 커밋 후 `git status`로 확인.
+### Step 4: 푸시
+"푸시할까요?" 확인 후 — 첫 푸시는 `git push -u origin 현재브랜치`, 이후 `git push`.
 
-### Step 4: 결과 안내
+### Step 5: PR 생성
+- 기존 PR 확인: `gh pr list --head 브랜치 --state open` → 있으면 건너뜀.
+- 없으면 확인 후 생성(base **main**, conventions.md §3 템플릿):
+  gh pr create --base main --title "타입: 내용" --body "..."
+  본문 = 개요 / 작업 내용 / 관련 이슈(`Closes #N` 단독 라인) / 리뷰어 참고. 제목엔 `(#N)` 생략.
 
-- 커밋 해시·메시지를 보여준다.
-- "푸시·PR은 GitHub 셋업(ADR 0007) 후 단계입니다" 안내.
+### Step 6: 완료 안내
+이슈·브랜치·PR URL 표시 + "PR에서 Kimi 리뷰 확인 → (수정) → 머지 버튼은 직접" 안내.
 
 ## 게이트(훅) 처리
-
-- **커밋이 막히면** 사유를 읽고 고친 뒤 재시도:
-  - lint-staged가 파일을 자동 수정했으면 → 바뀐 파일 다시 `git add` 후 재커밋.
-  - commitlint이 막았으면 → 메시지 규칙 위반(예: 제목 대문자 시작, 비표준 type, 끝 마침표) 수정 후 재커밋.
-- **`--no-verify`로 게이트 우회 금지** (사용자가 명시적으로 요청할 때만).
+- 커밋 막히면: lint-staged가 고친 파일 다시 `git add` 후 재커밋 / commitlint 위반(대문자 시작·비표준 type·끝 마침표) 수정 후 재커밋.
 
 ## 금지 사항
-
-- **main 직접 커밋 금지** — 작업 브랜치 → (나중에) PR.
-- **force push 금지**, **머지 금지**(머지는 사용자가 직접).
-- **커스텀 커밋 타입 금지** (표준 11개만).
-- **게이트 우회(`--no-verify`) 금지.**
-
-## 나중에 (push/PR — MVP 마무리 후)
-
-브랜치·PR·이슈 컨벤션은 [ADR 0007](../../../docs/decisions/0007-workflow-conventions.md)·[conventions.md](../../../docs/conventions.md)로 확정됨. 단 실제 적용(이슈→브랜치→PR)은 **MVP 마무리 이후** 새 작업부터. 그때 이 스킬에 추가:
-- 커밋 제목에 이슈 번호 `(#N)` 붙이기
-- `git push`(첫 푸시 `-u`)
-- `gh pr create`(base `main`, conventions.md의 PR 템플릿) + `Closes #N`
+- main 직접 커밋 금지 · force push 금지 · **머지 금지(사용자가 직접)** · 커스텀 타입 금지 · `--no-verify`(게이트 우회) 금지.
