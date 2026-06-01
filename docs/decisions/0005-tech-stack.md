@@ -11,6 +11,7 @@
 - **화면 스타일 = Tailwind CSS**
 - **데이터 저장 = 브라우저 localStorage + JSON 내보내기/가져오기** (데이터베이스는 미룸, [roadmap](../roadmap.md) #7)
 - **테스트 러너 = Vitest**
+- **HTTP 요청 = 브라우저·Node 내장 `fetch`** (axios 등 별도 HTTP 라이브러리 미사용) — 2026-06-01 보강
 - **린트·포맷 표준 = cuddle-market 방식 채택** — ESLint flat config(`eslint-config-next` core-web-vitals + typescript + prettier + react/hooks, 팀 규칙: 타입은 interface·이름 있는 컴포넌트는 function 선언) + Prettier(세미콜론 X·작은따옴표·printWidth 130·Tailwind 클래스 정렬). 단 **Storybook 플러그인은 미사용이라 제외**. 구체 설정·적용법은 [setup-lint-format](../setup-lint-format.md).
 - **버전(주력 스택, cuddle-market 기준)**: Next 16 · React 19 · TypeScript 5 · Tailwind 4 · Vitest 4 · ESLint 9(flat config).
 
@@ -19,6 +20,7 @@
 - **Tailwind CSS**: 사용자 주력, 빠른 UI 작성. (포기: 별도 CSS 설계 — MVP엔 불필요)
 - **localStorage + JSON**: 서버·DB 없이 0 인프라로 저장(로컬 우선, [0003]). JSON 내보내기/가져오기로 백업·이동. (포기: 기기 간 동기화 — DB는 [roadmap](../roadmap.md) #7로)
 - **Vitest**: 요즘 표준 러너. Vite/Next 생태계·ESM 친화, 빠름, RTL과 궁합 좋음. 순수 함수(추출기) TDD에 충분. (포기: Jest의 더 넓은 레거시 생태계 — 신규 프로젝트엔 Vitest가 가벼움)
+- **fetch(내장)**: velog 본문 가져오기 등 외부 요청이 소수라 내장 `fetch`로 충분하다. 의존성 0(설치 불필요)·클라이언트와 서버 라우트(Node)에서 동일 동작·Next.js의 fetch 확장(캐싱)과 궁합. (포기: axios의 자동 JSON 파싱·인터셉터·HTTP 4xx/5xx 자동 throw — 요청이 적어 직접 처리로 충분. 요청 수·공통 처리(인증 헤더 등)가 늘면 재검토)
 
 ## 결과 (이 결정으로 생기는 영향)
 - MVP 게이트: `tsc`(타입체크) + lint + Vitest 유닛테스트(추출기) + 사람 수동 검수.
