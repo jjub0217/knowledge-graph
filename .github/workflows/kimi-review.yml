@@ -56,7 +56,7 @@ jobs:
 
           CONTENT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // "리뷰 생성 실패 — Actions 로그 확인"')
           echo "$RESPONSE" | jq -r '.error // empty'
-          printf "## 🤖 Kimi 코드리뷰 (kimi-k2.6 · OpenRouter)\n\n%s\n\n---\n*봇은 diff만 봅니다 — 거짓 양성일 수 있으니 사람이 한 번 거르세요.*" "$CONTENT" \
+          printf "## 🤖 Kimi 코드리뷰 (kimi-k2.6 · OpenRouter)\n\n%s\n" "$CONTENT" \
             | gh pr comment "$PR_NUMBER" --repo "$REPO" --body-file -
 
       - name: Cleanup
