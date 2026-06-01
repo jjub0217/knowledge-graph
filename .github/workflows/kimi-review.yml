@@ -30,7 +30,7 @@ jobs:
           REPO="${{ github.repository }}"
           PR_TITLE=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json title -q '.title')
           PR_BODY=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json body -q '.body')
-          DIFF_CONTENT=$(head -c 100000 pr_diff.txt) # diff 100KB 제한(토큰 절약)
+          DIFF_CONTENT=$(head -c 100000 pr_diff.txt | iconv -c -f UTF-8 -t UTF-8) # 100KB 제한(토큰 절약) + 멀티바이트 중간 절단 시 무효 바이트 제거
 
           # 모델 슬러그가 다르면 첫 실행 로그에서 확인해 수정 (OpenRouter 모델 목록 기준)
           REQUEST_BODY=$(jq -n \
