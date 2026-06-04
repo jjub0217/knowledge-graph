@@ -1,13 +1,27 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { InputPanel } from '@/components/InputPanel'
 import type { Candidate } from '@/lib/types'
 import { useGraph } from '@/lib/graph-store'
+import { saveGraph, loadGraph } from '@/lib/storage'
 import { CandidateReview } from '@/components/CandidateReview'
+import { GraphView } from '@/components/GraphView'
 
 export default function Home() {
   const [candidates, setCandidates] = useState<Candidate[]>([])
-  const nodes = useGraph((state) => state.nodes)
+  // const nodes = useGraph((state) => state.nodes)
+  const { nodes, edges, setAll } = useGraph()
+
+  // 첫 로드: localStorage에 저장된 그래프 복원
+  useEffect(() => {
+    const saved = loadGraph()
+    setAll(saved.nodes, saved.edges)
+  }, [setAll])
+
+  // 변경 시: localStorage에 저장
+  useEffect(() => {
+    saveGraph({ nodes, edges })
+  }, [nodes, edges])
 
   return (
     <main className="space-y-4 p-4">
@@ -35,6 +49,10 @@ export default function Home() {
           </li>
         ))}
       </ul>
+      {/* 5. 그래프 — 점 두 번 클릭=연결, 선 클릭=삭제 */}
+      <div style={{ height: 300 }}>
+        <GraphView />
+      </div>
     </main>
   )
 }
