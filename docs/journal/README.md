@@ -160,3 +160,24 @@
 - **ADR 0008**(Kimi·OpenRouter·커스텀 워크플로 결정) 작성 + OpenRouter Kimi 워크플로 생성.
 - **Task 7(InputPanel)부터 정석 흐름**: 이슈 → 브랜치(`feat/N-...`) → 코딩 → 커밋·푸시 → PR → **Kimi 자동 리뷰** → 사용자 머지.
 - Kimi 셋업을 별도 PR로 먼저 vs Task 7 PR에 묶기 — 사용자 결정 대기.
+
+---
+
+## 2026-06-04 (목) — Kimi 워크플로 실전 가동 + Task 7 마무리 + Task 8(RTL 컴포넌트 테스트) 시작
+
+### 한 일
+- **Kimi 코드리뷰 워크플로 실전 가동**: Kimi 셋업을 별도 PR(#3, `chore/2-kimi-review`)로 먼저 머지(OpenRouter·k2.6·커스텀 워크플로 + ADR 0008). 셋업 PR이 **자기 자신을 리뷰**하며 스모크 테스트.
+- **Task 7(InputPanel) 정석 흐름 완주**: 이슈 #4 → 브랜치 → InputPanel + 시연용 page → PR #5 → Kimi 리뷰 → 머지. (멘토 시연용으로 page.tsx 임시 연결도 포함)
+- **(3일 만에 복귀)** InputPanel의 Kimi 진짜 지적 2개(velog/파일 try-catch, 에러 초기화)가 **미반영 채 머지됐던 것 발견** → **PR #7**(이슈 #6, `fix/6`)로 반영·머지. (`git stash`로 main 작업본을 새 브랜치로 옮겨 처리)
+- **Task 8(CandidateReview) 시작**: 이슈 #8 + 브랜치 `feat/8-candidate-review`. **RTL 컴포넌트 테스트를 처음 도입**(TDD식 — 테스트 먼저). RTL 셋업(jest-dom 연결) 진행 중.
+
+### 막힌 점 / 결정
+- **(결정) RTL 컴포넌트 테스트를 MVP에 도입**: spec §9는 "후보확인 UI 컴포넌트 테스트 = 나중으로 미룸"이었으나, **학습이 1급 목표**라 지금 체험하기로(선택 B). 단 GraphView(canvas)는 jsdom에서 못 그려 여전히 수동 검수. → spec §9 갱신 예정.
+- **(결정) Task 8 = TDD식**(RTL 테스트 먼저 → 컴포넌트).
+- **(Kimi 검증 실증)** 워크플로 셋업 PR·기능 PR에서 Kimi가 **진짜 버그**(체크아웃 fetch-depth 낭비, diff의 **UTF-8 바이트 절단** — 한글 깨짐)와 **헛짚음**(false positive: printf %·할당 따옴표·`pull-requests: read` 중복)을 섞어 냄 → **하나씩 실측 검증해 진짜만 반영, 헛짚음은 근거로 반박.** "맹목 수용도 무시도 아닌 검증"의 실제 사례.
+- **(개념 정리)** RTL ≠ TDD: **RTL=도구**(컴포넌트 테스트), **TDD=순서**(테스트 먼저) — 서로 다른 축이라 곱해서 씀("RTL 테스트를 TDD식으로"). / **스코프 패키지**: `@testing-library/react`가 RTL의 정식 이름(`@조직/패키지` 통째로, 옛 `react-testing-library`에서 이사). / **jest-dom**은 RTL이 아니라 DOM matcher 추가 패키지(짝꿍). / `setup.ts`+`vitest.config setupFiles` = "무엇을·언제 실행"(부수효과 import 등록). / **co-location**: 테스트 파일은 대상 옆(관심사=역할로 나눔, 테스트는 그 코드의 관심사), 공유 설정만 `src/test`로.
+- **(반성/표현)** false positive를 **"헛짚음"** 으로 부르기로(영어 직역 대신). 컴포넌트도 사용자가 **직접 타이핑**(클로드는 제시만).
+
+### 다음
+- RTL 셋업 마무리(setup 파일 방식 vs 테스트마다 import) → **RED**(`CandidateReview.test.tsx`, RTL 첫 사용) → **GREEN**(컴포넌트) → spec §9·§7.1 갱신 → `/commit-push` → PR → Kimi → 머지.
+- Task 9에서 page 정식 조립 + react-force-graph(시각 검증 시작).

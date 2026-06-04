@@ -103,10 +103,15 @@ src/
 │   ├── GraphView.tsx        # react-force-graph 렌더·연결·색·고립 강조
 │   ├── SearchFilter.tsx     # 개념 검색 + 주제 거르기
 │   └── Controls.tsx         # JSON 내보내기/가져오기 + 점 삭제
-└── app/          # 페이지 + 서버 라우트 (Next.js 규칙: 파일 위치 = 경로)
-    ├── layout.tsx          # 공통 레이아웃 (스캐폴딩 기본)
-    ├── page.tsx            # 메인 화면 (위 컴포넌트들을 조립)
-    └── api/velog/route.ts  # velog 본문 가져오는 서버 라우트 (CORS 우회, [0004])
+├── app/          # 페이지 + 서버 라우트 (Next.js 규칙: 파일 위치 = 경로)
+│   ├── layout.tsx          # 공통 레이아웃 (스캐폴딩 기본)
+│   ├── page.tsx            # 메인 화면 (위 컴포넌트들을 조립)
+│   └── api/velog/route.ts  # velog 본문 가져오는 서버 라우트 (CORS 우회, [0004])
+└── test/         # 테스트 전용 공용 설정 (앱 빌드 X) — 모든 테스트가 공유
+    └── setup.ts  # RTL의 jest-dom matcher 등록 (vitest setupFiles로 테스트 전 실행)
+
+# 테스트 파일(.test.ts/.test.tsx)은 대상 코드 "옆에" 둠 (co-location):
+#   lib/extractor.test.ts · components/CandidateReview.test.tsx …
 ```
 
 | 폴더             | 역할                       | 왜 따로 두나                                    |
@@ -114,8 +119,10 @@ src/
 | `src/lib`        | 순수 로직·상태 (화면 아님) | 테스트하기 쉬움(순수 함수) · 재사용 · UI와 분리 |
 | `src/components` | React UI 조각              | "보여주기"만 전담 → 로직과 안 섞임              |
 | `src/app`        | 페이지 + 서버 라우트       | Next.js 규칙(파일 위치가 곧 URL 경로)           |
+| `src/test`       | 테스트 전용 **공용 설정**  | 모든 테스트가 공유 → 어느 대상에도 안 묶임(중립). 테스트 *파일* 자체는 대상 옆(co-location) |
 
 > 같은 Task 안에서도 자리가 갈린다 — 예: Task 6의 `parseVelogUrl`(로직)은 `lib/velog.ts`, velog 라우트는 `app/api/velog/route.ts`.
+> **테스트 배치**: 한 대상을 검사하는 테스트 파일은 그 대상 옆(co-location). `setup.ts`처럼 모든 테스트가 공유하는 설정만 중립 폴더 `src/test`에.
 
 ## 8. 에러 처리 (바깥에서 들어오는 데이터만 검사, 안쪽 내 코드는 신뢰)
 
@@ -127,14 +134,15 @@ src/
 
 ## 9. 테스트 전략
 
-**MVP = 유닛 테스트만.**
+**MVP = 유닛 테스트(TDD) + 폼류 컴포넌트 RTL 테스트.**
 
-- **추출기 = 유닛 테스트 + TDD**(순수 함수라 테스트 먼저 짜기 좋음) → 로직의 **강한 게이트**. 러너는 **Vitest** 추천(남은 결정 참조).
-- 그 밖의 MVP 게이트: `tsc`(타입체크, 약한 게이트) + lint + **사람 수동 검수**(그래프가 화면에 잘 그려지는지).
+- **lib 로직(추출기 등) = 유닛 테스트 + TDD**(순수 함수라 테스트 먼저 짜기 좋음) → 로직의 **강한 게이트**. 러너 = **Vitest**.
+- **폼류 컴포넌트(후보 확인 UI 등) = RTL 컴포넌트 테스트**(Vitest + RTL + jsdom). 클릭→상태 변화를 검증. *(2026-06-04 도입 — 학습 목적 + jsdom으로 테스트 가능한 영역이라 앞당김. RTL=React Testing Library)*
+- 그 밖의 MVP 게이트: `tsc`(타입체크, 약한 게이트) + lint + **사람 수동 검수**.
 
 **나중으로 미룸** (1차엔 과해서):
 
-- 후보 확인 UI·그래프 동작 = 컴포넌트 테스트(RTL + jsdom = 가짜 브라우저).
+- **그래프 화면(GraphView) = 수동 검수**. canvas(react-force-graph)는 jsdom이 안 그려 RTL로 시각 검증 불가 → 사람이 눈으로.
 - velog 라우트 = 통합 테스트(velog 응답을 가짜로 넣어 검증).
 - 전체 흐름 = E2E(Playwright) 골든패스(정상 성공 경로) 1개.
 
