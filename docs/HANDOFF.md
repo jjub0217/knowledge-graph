@@ -2,7 +2,7 @@
 
 > **목적**: cuddle-market 경로에서 진행한 브레인스토밍 세션(2026-05-27)을 새 경로(`~/Desktop/knowledge-graph`)의 새 Claude Code 세션이 끊김 없이 이어받기 위한 문서.
 >
-> **새 세션 첫 작업**: 이 문서를 읽고, 아래 "현재 상태 / 다음 단계"부터 brainstorming을 계속한다.
+> **새 세션 첫 작업**: 이 문서를 읽고, 아래 "7. 현재 상태 / 다음 단계"부터 구현을 계속한다.
 
 ---
 
@@ -115,27 +115,30 @@
 
 ## 7. 현재 상태 / 다음 단계 ★
 
-> **2026-05-29 기준: brainstorming → spec → 구현 계획까지 전부 완료.** 다음 세션은 **구현부터** 시작.
+> **2026-06-05 기준: MVP 구현 계획 11개 중 Task 1~9 완료.** MVP 핵심 흐름(추출 → 채택 → 그래프 시각화 → 저장)이 끝까지 동작함. 남은 건 Task 10·11.
 
-### 완료 (설계 단계 전부)
-- [x] 설계 명확화: 핵심가치=**관계 발견**, 노드=개념/키워드(평면, 주제=색), 엣지="관련" 무방향(수동), 소스=하이브리드(학습 로그 .md 업로드 + velog 글 URL)
-- [x] **ADR 0001~0006** (`docs/decisions/`): 노드입도 · 노드출처(섞기) · Next.js · velog(GraphQL+서버라우트) · 스택(TS·Tailwind·localStorage·Vitest) · 그래프 라이브러리(react-force-graph)
-- [x] **설계 문서(spec)** 작성·검토: `docs/specs/2026-05-29-knowledge-graph-design.md`
-- [x] roadmap 단일출처(`docs/roadmap.md`) · interview-prep · 빌드 저널 · 주간 학습 로그 갱신
-- [x] `/journal` 프로젝트 스킬(`.claude/skills/journal/`) · 게이트 셋업 문서(`docs/setup-lint-format.md`)
-- [x] OMC 플러그인 비활성화(Claude Code 네이티브 학습), statusLine 제거
-- [x] git init + 첫 커밋(main, `f85faf6`). 커밋 컨벤션=Conventional Commits, 구현은 작업 브랜치
-- [x] **구현 계획** 작성: `docs/plans/2026-05-29-knowledge-graph-mvp.md` (11개 작업)
+### 완료
+- [x] **설계 전부**: spec(`docs/specs/2026-05-29-knowledge-graph-design.md`) · 구현 계획(`docs/plans/2026-05-29-knowledge-graph-mvp.md`, 11개) · **ADR 0001~0009**
+- [x] **Task 1~6 (로직·토대)**: 셋업+게이트 · 공유 타입 · 추출기(TDD) · 저장소(localStorage+JSON) · 그래프 연산+zustand 스토어 · velog 라우트. 유닛 테스트로 검증.
+- [x] **Task 7 입력 UI**(InputPanel: .md 업로드 + velog URL) · **Task 8 후보 확인 UI**(CandidateReview, **RTL 컴포넌트 테스트 첫 도입**)
+- [x] **Task 9 그래프 화면**(GraphView, react-force-graph-2d): 점·선 렌더, 같은 주제=같은 색, 고립·약연결(degree≤1)=회색·크게, 점 2번 클릭=연결, 선 클릭=삭제, 라벨 항상 표시(`nodeCanvasObjectMode='after'`), page에 localStorage 저장/복원 조립
+- [x] **GitHub 셋업**(공개 repo) + 워크플로 컨벤션(`docs/conventions.md`, ADR 0007) + **Kimi 코드리뷰**(ADR 0008) + 이슈→브랜치→PR→리뷰→사용자 머지 흐름 가동
+- [x] **추출기 노이즈 1단계 수정**(펜스 코드블록 제외, TDD, ADR 0009) · **로드맵 우선순위 재배치**(배포→추출 정교화 우선)
+- [x] interview-prep ③/④ + 빌드 저널 + 주간 학습 로그 라이브 갱신 · velog 글에 TDD·RTL·E2E 섹션 게시
 
-### 다음 세션 시작점 = 구현 ★
-- **`docs/plans/2026-05-29-knowledge-graph-mvp.md`의 Task 1부터** 실행.
-- Task 1 = 작업 브랜치(`feat/mvp`) → `create-next-app` → 게이트 설치(eslint/prettier·husky·commitlint·lint-staged, 상세 `docs/setup-lint-format.md`).
-- 실행 방식: writing-plans의 execution handoff(서브에이전트 구동 추천 / 인라인) 중 선택.
-- ⭐ **추출기(Task 3)는 TDD 첫 체험** — 사용자가 직접 RED→GREEN→REFACTOR.
-- 메모리 `project_setup_gate_step.md` 참고(구현 첫 단계 = 게이트 깔기).
+### 다음 세션 시작점 = Task 10 ★
+- **`docs/plans/2026-05-29-knowledge-graph-mvp.md`의 Task 10부터** 실행.
+- **Task 10 = 검색 + 주제 필터**(점이 많아지면 찾기/거르기). **Task 11 = 페이지 컨트롤**(JSON 내보내기/가져오기 + 점 삭제).
+- 흐름: 이슈 생성 → 브랜치(`feat/N-설명`) → 구현(컴포넌트는 **사용자가 직접 타이핑**, Claude는 제시만) → tsc → 커밋·푸시 → PR → Kimi 리뷰 → **사용자가 직접 머지**.
+- Task 10·11 끝나면 **MVP 완성 → 로드맵 1순위 "배포"**로.
+
+### 미뤄둔 것 / 후속 (별도 이슈 후보)
+- **추출 노이즈 2단계**(문장형 제목·경로 등 "개념 아님" 거르기) — ADR 0009에서 보류(사람 확정이 흡수). 필요해지면 별도 이슈.
+- **Kimi 워크플로 견고화** — PR #17에서 리뷰가 빈 응답으로 2회 실패(추정: `max_tokens:4000`을 추론이 소진). `max_tokens` 상향 또는 content 비면 `reasoning` 폴백.
+- **GraphView 개선**(다음 반복): 연결 시작점(pending) 시각 표시 없음.
 
 ### 기술 스택 (확정 — ADR 참조)
-- Next.js 16 · React 19 · TypeScript 5 · Tailwind 4 · Vitest 4 · react-force-graph · zustand (ADR 0003·0005·0006).
+- Next.js 16 · React 19 · TypeScript 5 · Tailwind 4 · Vitest 4 · **react-force-graph-2d**(2D 전용) · zustand · @testing-library/react(RTL) (ADR 0003·0005·0006).
 
 ---
 
@@ -147,8 +150,8 @@ cd ~/Desktop/knowledge-graph
 claude
 ```
 이제 프로젝트 `CLAUDE.md`가 자동 로드되며 "세션 시작 시 docs/HANDOFF.md 먼저 읽어라"라고 지시함. 따라서 첫 메시지는 간단히:
-> **"이어서 진행해줘"** (또는 "구현 계획 Task 1부터 시작해줘")
+> **"이어서 진행해줘"** (또는 "구현 계획 Task 10부터 시작해줘")
 
-Claude는 CLAUDE.md 지시에 따라 이 문서를 읽고 "7. 다음 단계"의 **구현**(`docs/plans/2026-05-29-knowledge-graph-mvp.md`의 Task 1)부터 시작한다.
+Claude는 CLAUDE.md 지시에 따라 이 문서를 읽고 "7. 다음 단계"의 **Task 10(검색 + 주제 필터)**부터 시작한다.
 
-(git은 이미 초기화·첫 커밋 완료. 구현은 작업 브랜치 `feat/mvp`에서.)
+(Task 1~9 완료·머지됨. 구현은 작업 브랜치 `feat/N-설명` → PR → 사용자 머지.)
