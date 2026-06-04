@@ -34,6 +34,10 @@ describe('개념 후보 추출', () => {
     //  - 여기서 "검사할 값"은 extractCandidates('## React useEffect')의 결과로, 배열이 들어온다.
     //  예시: 배열 [{ text:'React useEffect', source:'heading' }] 가 들어온다.
     //  expect(검사할 값) 의 반환값은,  matcher(검사 메소드)들이 잔뜩 달린 "검사 도구 객체"가 된다.
+    /** expect( 2 + 2 ).toBe( 4 )
+               └실제값┘  └매처┘└기대값┘ 
+       "2+2가 4와 정확히 같나?"
+               */
     /** {
     toContainEqual: f(),   // "포함하나?" 검사 함수
     toEqual:        f(),   // "전체 같나?" 검사 함수
@@ -54,7 +58,9 @@ describe('개념 후보 추출', () => {
   // — 1번째 인자 '인라인 코드를 뽑는다' : 이 테스트가 "무엇을 기대하는지"를 적는 설명 문장.
   // 2번째 인자 () => {} = 검사 콜백. 이 안에서 실제로 "검사"를 수행한다.
   it('인라인 코드를 뽑는다', () => {
-    // [expect] 검사할 값 = extractCandidates('의존성 배열 `deps` 학습') 의 반환값(후보 배열).
+    // [expect] 검사할 값
+    //  - 검사할 실제 값을 감싸는 함수. "이거 좀 볼게" 하고 값을 손에 쥐는 것.
+    //  - extractCandidates('의존성 배열 `deps` 학습') 의 반환값(후보 배열).
     //   예시: [{ text:'deps', source:'code' }] 가 들어온다. (expect는 이 값을 기억한 "검사 도구 객체"를 돌려줌)
     // [.toContainEqual] matcher: 그 배열 안에 { text:'deps', source:'code' } 와 값이 똑같은 원소가 있나?
     //   백틱(`)으로 감싼 `deps` 같은 "인라인 코드"를 source:'code' 후보로 뽑길 기대.
