@@ -1,6 +1,6 @@
 'use client'
 import dynamic from 'next/dynamic'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useGraph } from '@/lib/graph-store'
 import { degree } from '@/lib/graph-ops'
 
@@ -12,19 +12,26 @@ const COLORS = ['#4f46e5', '#16a34a', '#dc2626', '#d97706', '#0891b2', '#9333ea'
 const colorOf = (topic: string) => COLORS[[...topic].reduce((sum, char) => sum + char.charCodeAt(0), 0) % COLORS.length]
 
 export function GraphView() {
-  const { nodes, edges, addEdge, removeEdge } = useGraph()
+  const nodes = useGraph((state) => state.nodes)
+  const edges = useGraph((state) => state.edges)
+  const addEdge = useGraph((state) => state.addEdge)
+  const removeEdge = useGraph((state) => state.removeEdge)
+
   const [pending, setPending] = useState<string | null>(null) // 연결 시작점(첫 클릭한 점)
 
-  const data = {
-    // weak = 연결이 없거나(고립) 적은(약연결) 점: degree(연결 수) ≤ 1
-    nodes: nodes.map((node) => ({
-      id: node.id,
-      label: node.label,
-      topic: node.topic,
-      weak: degree(edges, node.id) <= 1,
-    })),
-    links: edges.map((edge) => ({ id: edge.id, source: edge.source, target: edge.target })),
-  }
+  const data = useMemo(
+    () => ({
+      // weak = 연결이 없거나(고립) 적은(약연결) 점: degree(연결 수) ≤ 1
+      nodes: nodes.map((node) => ({
+        id: node.id,
+        label: node.label,
+        topic: node.topic,
+        weak: degree(edges, node.id) <= 1,
+      })),
+      links: edges.map((edge) => ({ id: edge.id, source: edge.source, target: edge.target })),
+    }),
+    [nodes, edges]
+  )
 
   function onNodeClick(node: any) {
     if (!pending)
