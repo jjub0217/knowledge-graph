@@ -94,4 +94,17 @@ describe('개념 후보 추출', () => {
     // [.toHaveLength] matcher: 그 배열의 길이(.length)가 정확히 1인지 본다. (1개뿐 = 중복이 제거됨)
     expect(candidates.filter((candidate) => candidate.text === 'deps')).toHaveLength(1)
   })
+
+  // [it] 테스트 한 개 — '펜스 코드블록 안은 후보로 뽑지 않는다' = 기대 동작, 2번째 인자 콜백 = 검사.
+  it('펜스 코드블록 안은 후보로 뽑지 않는다', () => {
+    // 세 겹 백틱(```)으로 감싼 코드 블록 + 그 밖의 인라인 코드를 섞은 글.
+    // [.join('\n')] 배열을 줄바꿈으로 이어 붙여 여러 줄 마크다운을 만든다.
+    const markdown = ['# 제목', '', '```bash', 'git checkout develop', '```', '', '`인라인코드`'].join('\n')
+    const candidates = extractCandidates(markdown)
+    // [.some] 조건을 만족하는 원소가 하나라도 있으면 true. 펜스 안 'git checkout'은 후보에 없어야 하므로 false
+    // 기대.
+    expect(candidates.some((candidate) => candidate.text.includes('git checkout'))).toBe(false)
+    // 펜스 '밖' 인라인 코드는 정상으로 뽑혀야 한다 (펜스만 제거, 멀쩡한 인라인은 유지).
+    expect(candidates).toContainEqual({ text: '인라인코드', source: 'code' })
+  })
 })

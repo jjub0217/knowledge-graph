@@ -36,6 +36,9 @@ export function extractCandidates(markdown: string): Candidate[] {
   const candidates: Candidate[] = []
   const seenTexts: string[] = [] // 이미 넣은 후보 텍스트 목록 (중복 확인용)
 
+  // 펜스 코드블록(``` … ```)을 먼저 제거 — 안의 코드는 개념이 아니므로 추출 대상에서 뺀다.
+  const withoutFences = markdown.replace(/```[\s\S]*?```/g, '')
+
   // 후보 하나를 추가하되, 빈 값·중복은 거른다 (세 곳에서 공통으로 씀)
   function addCandidate(rawText: string, source: Candidate['source']) {
     const text = rawText.trim()
@@ -46,18 +49,18 @@ export function extractCandidates(markdown: string): Candidate[] {
   }
 
   // 제목(#)에서 개념 뽑기
-  for (const line of markdown.split('\n')) {
+  for (const line of withoutFences.split('\n')) {
     const match = line.match(/^#{1,6}\s+(.+)$/)
     if (match) addCandidate(match[1], 'heading')
   }
 
   // 인라인 코드(`...`)에서 뽑기
-  for (const match of markdown.matchAll(/`([^`]+)`/g)) {
+  for (const match of withoutFences.matchAll(/`([^`]+)`/g)) {
     addCandidate(match[1], 'code')
   }
 
   // 볼드(**...**)에서 뽑기
-  for (const match of markdown.matchAll(/\*\*([^*]+)\*\*/g)) {
+  for (const match of withoutFences.matchAll(/\*\*([^*]+)\*\*/g)) {
     addCandidate(match[1], 'bold')
   }
 
