@@ -41,6 +41,13 @@ export function GraphView() {
       setPending(null)
     }
   }
+
+  function drawNode(node: any, ctx: CanvasRenderingContext2D, globalScale: number) {
+    const fontSize = 12 / globalScale
+    ctx.font = `${fontSize}px Sans-Serif`
+    ctx.fillStyle = '#e5e7eb'
+    ctx.fillText(node.label, node.x + 6, node.y)
+  }
   return (
     <ForceGraph2D
       graphData={data}
@@ -51,13 +58,7 @@ export function GraphView() {
       linkWidth={2}
       // 점은 라이브러리가 그리고('after'), 우리는 라벨만 덧그림
       nodeCanvasObjectMode={() => 'after'}
-      nodeCanvasObject={(node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-        // 점은 라이브러리가 그리고('after'), 우리는 라벨만 덧그림
-        const fontSize = 12 / globalScale
-        ctx.font = `${fontSize}px Sans-Serif`
-        ctx.fillStyle = '#e5e7eb'
-        ctx.fillText(node.label, node.x + 6, node.y)
-      }}
+      nodeCanvasObject={drawNode}
       onLinkClick={(link: any) => removeEdge(link.id)} // 선 클릭 = 삭제
     />
   )
