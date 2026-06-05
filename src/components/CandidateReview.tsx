@@ -8,19 +8,26 @@ export function CandidateReview({ candidates }: { candidates: Candidate[] }) {
   // 필요한 것만 구독하면, 다른 게 바뀌어도 불필요한 다시 그리기(리렌더)가 줄어요.
   // (zustand 권장 방식)
   const addNode = useGraph((state) => state.addNode) // 스토어에서 addNode 함수만 꺼냄
-  const [topic, setTopic] = useState('기타')
+
+  // 현재 주제, 처음엔 '기타'
+  const [selectedTopic, setSelectedTopic] = useState('기타')
 
   // accept = 채택 버튼이 부르는 함수.
   // 후보를 채택 → 그 후보를 점(노드)으로 스토어에 추가
   function accept(candidate: Candidate) {
     // addNode({ id, label, topic })로 스토어에 점 추가.
     // (id·label은 후보 텍스트, topic은 입력칸 값)
-    addNode({ id: candidate.text, label: candidate.text, topic })
+    addNode({ id: candidate.text, label: candidate.text, topic: selectedTopic })
   }
 
   return (
     <div className="space-y-1">
-      <input className="border px-2" value={topic} onChange={(event) => setTopic(event.target.value)} placeholder="주제(색)" />
+      <input
+        className="border px-2"
+        value={selectedTopic}
+        onChange={(event) => setSelectedTopic(event.target.value)}
+        placeholder="주제(색)"
+      />
       <ul>
         {candidates.map((candidate) => (
           //  후보마다 <li>(텍스트 + "채택" 버튼) 한 줄씩
