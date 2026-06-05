@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 학습 지식 그래프 (knowledge-graph)
 
-## Getting Started
+> 학습한 개념들을 **점(노드)과 연결선(엣지)으로 그려, 따로 배운 개념들이 사실은 이어져 있다는 걸 눈으로 발견**하게 하는 도구. Obsidian 그래프뷰를 학습 흐름에 특화시킨 버전.
 
-First, run the development server:
+핵심 가치는 **관계 발견**이다. 학습 로그·블로그 글에서 개념을 뽑아 점으로 만들고, 손으로 선을 이으며 "이 개념과 저 개념이 통하는구나"를 깨닫는다.
+
+---
+
+## 무엇을 / 왜
+
+- **무엇**: `.md` 학습 로그·velog 글에서 개념 키워드를 뽑아 → 사람이 골라 점으로 확정 → 손으로 연결해 관계를 그리는 웹앱.
+- **왜**: 학습 기록(주간 로그·velog 글)이 흩어져 있어 *무엇을 배웠고 어떻게 이어지는지* 한눈에 보기 어렵다. 그 흩어진 기록을 하나의 지도로 모은다.
+- 취업 포트폴리오 + 도구/워크플로우 학습 + 본인이 쓸 실용 도구 + 멘토 과제를 겸한다.
+
+> 글(`.md`·velog) 자체는 점이 아니다 — **개념을 캐내는 광산(입력 재료)**일 뿐이고, 거기서 뽑은 개념만 점으로 올라간다.
+
+---
+
+## 1차 MVP — "내 학습 토끼 굴을 그리는 지도"
+
+따로 배운 개념들의 관계를 손으로 그리며 발견한다. 자동 판단은 없고, 사람이 그리며 깨닫는 구조다.
+
+| 기능 | 역할 |
+| --- | --- |
+| 입력 | 학습 로그 `.md` 올리기 + velog 글 주소 붙여넣기 |
+| 후보 추출 | 글에서 키워드(제목·인라인 코드·볼드) 자동 추출 |
+| 후보 확인 → 점 확정 | 사람이 골라 채택하고 **주제(색)** 지정 → 개념 점이 됨 |
+| 점·선 편집 | 점 두 번 클릭 = 연결, 선 클릭 = 삭제 (연필 메모처럼 되돌리기 쉬움) |
+| 주제별 색 | 같은 주제 = 같은 색 → 개념 덩어리가 보임 |
+| 움직이는 그래프 | 끌기·확대축소·이동 |
+| 검색 + 주제 거르기 | 점이 많아지면 검색어로 찾고 주제(색)별로 켜고 끄기 |
+| 고립·약연결 강조 | 안 이어진 점을 회색·크게 → "여기 더 이어볼래?" 힌트 |
+| 저장 | 브라우저 자동 저장 + JSON 내보내기/가져오기 |
+
+---
+
+## 2차 이후 — "학습을 이끄는 능동 학습 도구" (로드맵)
+
+지도 위에 "진짜 아는지 측정 + 다음 안내"를 얹어, 정적인 지도를 능동 학습 도구로 키운다. (목록 순서 = 우선순위)
+
+**토대 다지기 (MVP 완주 직후)**
+
+1. **배포·공유** — 호스팅해 공개. 싸고 임팩트가 크며, 실제 사용 데이터가 다음 작업의 타깃을 정해준다.
+2. **추출 정교화** — velog 줄글에서 핵심 개념만 더 잘 뽑기. 추출은 파이프라인 맨 앞이라 후보가 지저분하면 그래프·퀴즈가 다 물려받는다.
+
+**능동 학습 루프 (큰 진화) ★**
+
+3. **퀴즈로 이해도 측정** ★ — 점 클릭 → 질문 → 답 → 맞나 판단 → 꼬리질문. 자기평가 대신 *측정*한다.
+4. **이해도 표시** — 점의 크기·테두리·투명도로 이해 정도 표시 (색은 주제가 쓰므로 다른 수단으로).
+5. **다음 학습 추천** — 고립·약연결 점에서 "다음은 이걸 배워봐".
+6. **연결선 자동 추천** — 기계가 관계 후보를 제안하고 사람이 확인.
+
+**그 너머**
+
+7. **DB 저장** — 여러 기기·백업·공유가 필요해지면 브라우저 저장에서 DB로.
+
+> 성장 스토리: 처음엔 되돌아보는 '지도'로 만들고, 다음 단계로 퀴즈를 붙여 이해도를 측정하는 '능동 학습 도구'로 키운다.
+
+---
+
+## 기술 스택
+
+Next.js 16 · React 19 · TypeScript 5 · Tailwind 4 · Vitest 4 · react-force-graph-2d · zustand
+
+- 순수 로직(추출·저장·그래프 연산)은 `src/lib`에 두고 단위 테스트(TDD)로 검증.
+- velog 글은 브라우저에서 직접 못 부르므로(CORS) 서버 라우트(`/api/velog`)가 대신 호출.
+- 그래프 화면은 클라이언트 컴포넌트(canvas) — `dynamic import + ssr:false`.
+- 게이트: ESLint/Prettier + Husky + commitlint + lint-staged.
+
+---
+
+## 실행 방법
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # 개발 서버 (http://localhost:3000)
+npm run lint       # 린트
+npx vitest run     # 테스트
+npx tsc --noEmit   # 타입 검사
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 문서
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+만들면서 결정·과정을 함께 기록한다 (면접에서 "어떻게 만들었는지" 설명하기 위한 1급 관심사).
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `docs/specs/` — 설계 문서 (무엇을·어떻게 만들 것인가)
+- `docs/decisions/` — ADR (기술·설계 결정의 이유)
+- `docs/journal/` — 빌드 저널 (막힌 점·해결)
+- `docs/interview-prep.md` — 면접 예상질문 답변
+- `docs/roadmap.md` — MVP 이후 할 것 (안 만들기로 한 결정 포함)
