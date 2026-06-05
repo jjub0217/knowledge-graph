@@ -8,6 +8,7 @@ import { saveGraph, loadGraph } from '@/lib/storage'
 import { CandidateReview } from '@/components/CandidateReview'
 import { GraphView } from '@/components/GraphView'
 import { SearchFilter } from '@/components/SearchFilter'
+import { Controls } from '@/components/Controls'
 
 export default function Home() {
   const [candidates, setCandidates] = useState<Candidate[]>([])
@@ -68,6 +69,9 @@ export default function Home() {
 
   return (
     <main className="space-y-4 p-4">
+      {/* 0. 페이지 컨트롤: 내보내기/가져오기 + 점 삭제 */}
+      <Controls />
+
       {/* 1. 입력 → 후보 추출 */}
       <InputPanel onCandidates={setCandidates} />
 
