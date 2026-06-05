@@ -14,8 +14,8 @@ export function Controls() {
     link.download = 'my-graph.json'
     link.click() // 보이지 않는 링크를 코드로 눌러 다운로드 시작
 
-    //  다운로드용 임시 주소를 정리 (안 하면 메모리에 쌓임)
-    URL.revokeObjectURL(url) // 다 쓴 임시 주소 정리(메모리 누수 방지)
+    // 다운로드가 시작된 뒤(다음 tick) 정리. click 직후 바로 해제하면 다운로드가 경쟁에서 져 실패/0바이트가 될 수 있음
+    setTimeout(() => URL.revokeObjectURL(url), 0)
   }
 
   // JSON 가져오기: 올린 파일을 읽어 그래프로 복원
