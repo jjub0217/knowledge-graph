@@ -2,7 +2,7 @@
 import dynamic from 'next/dynamic'
 import { useMemo, useState } from 'react'
 import { useGraph } from '@/lib/graph-store'
-import { degree } from '@/lib/graph-ops'
+import { isIsolated } from '@/lib/graph-ops'
 import type { GraphNode, GraphEdge } from '@/lib/types'
 
 // react-force-graph-2d는 브라우저 전용(canvas) → 서버 렌더 끄고(ssr:false) 동적 import
@@ -36,7 +36,7 @@ export function GraphView({
         id: node.id,
         label: node.label,
         topic: node.topic,
-        weak: degree(allEdges, node.id) <= 1,
+        isolated: isIsolated(allEdges, node.id),
       })),
       links: edges.map((edge) => ({ id: edge.id, source: edge.source, target: edge.target })),
     }),
@@ -61,8 +61,8 @@ export function GraphView({
   return (
     <ForceGraph2D
       graphData={data}
-      nodeColor={(node: any) => (node.weak ? '#9ca3af' : colorOf(node.topic))} // 고립·약연결 = 회색 강조
-      nodeVal={(node: any) => (node.weak ? 6 : 4)} // + 크게
+      nodeColor={(node: any) => (node.isolated ? '#9ca3af' : colorOf(node.topic))} // 고립 = 회색 강조
+      nodeVal={(node: any) => (node.isolated ? 6 : 4)} // + 크게
       onNodeClick={onNodeClick}
       linkColor={() => '#ffffff'}
       linkWidth={2}
