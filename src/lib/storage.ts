@@ -33,3 +33,9 @@ export function exportJSON(graph: Graph): string {
 export function importJSON(json: string): Graph {
   return JSON.parse(json) as Graph // 입구(바깥 데이터) — 호출하는 쪽에서 try/catch
 }
+
+// 저장된 그래프가 한 번이라도 있었나? (키 존재 = 첫 방문 아님)
+// 첫 방문(키 없음)과 "비우기 한 상태"(키 있고 빈 그래프)를 구분하는 데 씀.
+export function hasStoredGraph(): boolean {
+  return localStorage.getItem(KEY) !== null
+}
