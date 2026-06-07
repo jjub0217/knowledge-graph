@@ -247,18 +247,18 @@ gh pr create --base main --head feat/33-deploy --title "feat: 배포 준비 — 
 
 > ⚠️ Vercel 로그인·연결은 **사용자가 직접** 수행(인터랙티브). Claude는 안내만.
 
-- [ ] **Step 1: Vercel에 GitHub 저장소 연결**
+- [x] **Step 1: Vercel에 GitHub 저장소 연결**
 
 [vercel.com](https://vercel.com) 로그인(GitHub 계정) → "Add New… → Project" → `knowledge-graph` 저장소 Import → Framework "Next.js" 자동 감지 확인 → 환경변수 없음(그대로) → Deploy.
 
-- [ ] **Step 2: 배포 확인 (수동 검수)**
+- [x] **Step 2: 배포 확인 (수동 검수)**
 
 발급된 `*.vercel.app` 주소 접속 →
 - 첫 방문에 **예시 그래프**가 보이는지
 - **velog 주소 가져오기**가 실제로 되는지(serverless 함수 동작 확인 — "로컬에서 됨 ≠ 배포에서 됨")
 - 골든패스: 후보 채택 → 연결 → 새로고침 저장 → 검색/필터 → JSON 내보내기
 
-- [ ] **Step 3: README에 배포 URL 추가**
+- [x] **Step 3: README에 배포 URL 추가**
 
 `README.md` 상단(제목 아래)에 라이브 링크 한 줄 추가 후 커밋:
 
@@ -277,6 +277,6 @@ git commit -m "docs: README에 배포 URL 추가 (#33)"
 
 ### 마무리
 
-- [ ] 배포 URL 동작 확인(위 Task 6 Step 2) — 특히 velog serverless.
-- [ ] 로드맵 1번 "배포" 완료 → 다음은 2번 DB+인증(ADR 0010).
-- [ ] HANDOFF §7 "다음 단계"를 배포 완료 → DB+인증으로 갱신(별도 docs 작업).
+- [x] 배포 URL 동작 확인(위 Task 6 Step 2) — 특히 velog serverless.
+- [x] 로드맵 1번 "배포" 완료 → 다음은 2번 DB+인증(ADR 0010).
+- [x] HANDOFF §7 "다음 단계"를 배포 완료 → DB+인증으로 갱신(별도 docs 작업).
