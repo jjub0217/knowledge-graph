@@ -178,7 +178,7 @@ git commit -m "feat: 첫 방문 시 예시 그래프 시드 (#33)"
 **Files:**
 - Modify: `src/components/Controls.tsx`
 
-- [ ] **Step 1: 비우기 함수 + 버튼 추가**
+- [x] **Step 1: 비우기 함수 + 버튼 추가**
 
 `src/components/Controls.tsx`에서 `clearAll` 함수를 컴포넌트 안에 추가하고(`setAll`은 이미 구조분해로 꺼내 쓰고 있음), 버튼을 `return`의 `<div className="flex items-center gap-2">` 안 맨 앞에 넣는다.
 
@@ -199,16 +199,16 @@ git commit -m "feat: 첫 방문 시 예시 그래프 시드 (#33)"
       </button>
 ```
 
-- [ ] **Step 2: 타입 확인**
+- [x] **Step 2: 타입 확인**
 
 Run: `npx tsc --noEmit`
 Expected: 에러 없음.
 
-- [ ] **Step 3: 수동 검증**
+- [x] **Step 3: 수동 검증**
 
 Run: `npm run dev` → "비우기" 클릭 → confirm 확인 → 그래프가 빈 화면이 되는지. **새로고침해도 예시가 다시 안 뜨는지**(비우기 = 빈 그래프 저장 → 키 존재 → 재시드 안 함).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/components/Controls.tsx
