@@ -4,7 +4,8 @@ import { InputPanel } from '@/components/InputPanel'
 import type { Candidate } from '@/lib/types'
 import { useGraph } from '@/lib/graph-store'
 import { filterGraph, uniqueTopics } from '@/lib/graph-ops'
-import { saveGraph, loadGraph } from '@/lib/storage'
+import { saveGraph, loadGraph, hasStoredGraph } from '@/lib/storage'
+import { EXAMPLE_GRAPH } from '@/lib/example-graph'
 import { CandidateReview } from '@/components/CandidateReview'
 import { GraphView } from '@/components/GraphView'
 import { SearchFilter } from '@/components/SearchFilter'
@@ -57,9 +58,19 @@ export default function Home() {
   }
 
   // 첫 로드: localStorage에 저장된 그래프 복원
+  // useEffect(() => {
+  //   const saved = loadGraph()
+  //   setAll(saved.nodes, saved.edges)
+  // }, [setAll])
+
+  // 첫 로드: 처음 방문(저장 키 없음)이면 예시 그래프를, 아니면 저장본을 복원
   useEffect(() => {
-    const saved = loadGraph()
-    setAll(saved.nodes, saved.edges)
+    if (hasStoredGraph()) {
+      const saved = loadGraph()
+      setAll(saved.nodes, saved.edges)
+    } else {
+      setAll(EXAMPLE_GRAPH.nodes, EXAMPLE_GRAPH.edges) // 첫 방문 → 예시 시드
+    }
   }, [setAll])
 
   // 변경 시: localStorage에 저장
