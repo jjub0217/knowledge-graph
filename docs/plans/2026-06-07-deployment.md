@@ -20,7 +20,7 @@
 - Modify: `src/lib/storage.ts`
 - Test: `src/lib/storage.test.ts`
 
-- [ ] **Step 1: 실패 테스트 작성**
+- [x] **Step 1: 실패 테스트 작성**
 
 `src/lib/storage.test.ts` 상단 import에 `hasStoredGraph`를 추가하고(`import { saveGraph, loadGraph, exportJSON, importJSON, hasStoredGraph } from './storage'`), `describe('storage', ...)` 블록 안에 아래 테스트를 추가한다.
 
@@ -36,12 +36,12 @@
 
 (`sample`과 `beforeEach(() => localStorage.clear())`는 기존 파일에 이미 있음.)
 
-- [ ] **Step 2: 실패 확인**
+- [x] **Step 2: 실패 확인**
 
 Run: `npx vitest run src/lib/storage.test.ts`
 Expected: FAIL — "hasStoredGraph is not a function".
 
-- [ ] **Step 3: 최소 구현**
+- [x] **Step 3: 최소 구현**
 
 `src/lib/storage.ts` 맨 아래에 추가한다. (`KEY`는 이 파일 상단에 이미 선언된 `'knowledge-graph'` 상수)
 
@@ -53,12 +53,12 @@ export function hasStoredGraph(): boolean {
 }
 ```
 
-- [ ] **Step 4: 통과 확인**
+- [x] **Step 4: 통과 확인**
 
 Run: `npx vitest run src/lib/storage.test.ts`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/lib/storage.ts src/lib/storage.test.ts
@@ -74,7 +74,7 @@ git commit -m "feat: 첫 방문 판별 hasStoredGraph 추가 (TDD) (#33)"
 
 연결된 덩어리(주제색) + 고립 점 1개(회색·크게)를 넣어 색·연결·고립 강조가 한눈에 보이게 한다. degree: `useEffect`=2(허브), `useState`·`props`·`TDD`·`RTL`=1, `flexbox`=0(고립).
 
-- [ ] **Step 1: 파일 작성**
+- [x] **Step 1: 파일 작성**
 
 ```ts
 // src/lib/example-graph.ts
@@ -99,7 +99,7 @@ export const EXAMPLE_GRAPH: Graph = {
 }
 ```
 
-- [ ] **Step 2: 타입 확인 + Commit**
+- [x] **Step 2: 타입 확인 + Commit**
 
 Run: `npx tsc --noEmit`
 Expected: 에러 없음.
@@ -118,7 +118,7 @@ git commit -m "feat: 첫 방문용 예시 그래프 상수 (#33)"
 
 `hasStoredGraph()`가 거짓(첫 방문)이면 예시를, 참이면 저장본을 로드한다. (시드된 예시는 기존 "변경 시 저장" 효과로 localStorage에 저장되어, 다음 방문부턴 저장본 경로를 탄다.)
 
-- [ ] **Step 1: import 추가**
+- [x] **Step 1: import 추가**
 
 `src/app/page.tsx`의 import 구역에 두 줄을 추가한다.
 
@@ -129,7 +129,7 @@ import { EXAMPLE_GRAPH } from '@/lib/example-graph'
 
 (기존 `import { saveGraph, loadGraph } from '@/lib/storage'` 줄을 위의 `hasStoredGraph` 포함 버전으로 교체.)
 
-- [ ] **Step 2: 첫 로드 효과 수정**
+- [x] **Step 2: 첫 로드 효과 수정**
 
 기존:
 
@@ -155,16 +155,16 @@ import { EXAMPLE_GRAPH } from '@/lib/example-graph'
   }, [setAll])
 ```
 
-- [ ] **Step 3: 타입 확인**
+- [x] **Step 3: 타입 확인**
 
 Run: `npx tsc --noEmit`
 Expected: 에러 없음.
 
-- [ ] **Step 4: 수동 검증**
+- [x] **Step 4: 수동 검증**
 
 Run: `npm run dev` → 브라우저 콘솔에서 `localStorage.clear()` 후 새로고침 → **예시 그래프가 보이는지**(연결된 React/테스트 묶음 + 회색·큰 flexbox). 점을 하나 추가/연결한 뒤 새로고침 → 그 변경이 유지되는지(저장본 경로).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/app/page.tsx
