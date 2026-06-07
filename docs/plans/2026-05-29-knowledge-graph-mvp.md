@@ -747,7 +747,7 @@ git commit -m "feat(filter): 개념 검색 + 주제별 거르기"
 
 **Files:** Create `src/components/Controls.tsx`, Modify `src/app/page.tsx`
 
-- [ ] **Step 1: 컨트롤 컴포넌트**
+- [x] **Step 1: 컨트롤 컴포넌트**
 
 ```tsx
 // src/components/Controls.tsx
@@ -799,11 +799,11 @@ export function Controls() {
 
 (점 삭제 시 스토어 `removeNode`가 연결선도 함께 정리 — Task 5. 선 삭제는 그래프에서 선 클릭 — Task 9.)
 
-- [ ] **Step 2: page.tsx에 추가**
+- [x] **Step 2: page.tsx에 추가**
 
 `page.tsx`의 `<main>` 안 맨 위(InputPanel 위)에 `<Controls />`를 넣고 `import { Controls } from '@/components/Controls'`.
 
-- [ ] **Step 3: 수동 검증 + Commit**
+- [x] **Step 3: 수동 검증 + Commit**
 
 `npm run dev` → JSON 내보내기(파일 다운로드) → 새 탭/캐시 비운 뒤 JSON 가져오기로 복원 → "점 삭제"로 점·연결선 함께 사라지는지 확인.
 
@@ -816,9 +816,9 @@ git commit -m "feat(controls): JSON 내보내기/가져오기 + 점 삭제"
 
 ### 마무리
 
-- [ ] 전체 테스트: `npx vitest run` → 모두 PASS. `npm run lint` → 통과. `npx tsc --noEmit` → 에러 없음.
-- [ ] 골든패스 수동 점검: 로그 업로드 → 후보 채택 → 점 → 두 번 클릭 연결 → 새로고침해도 저장됨(localStorage) → JSON 내보내기/가져오기.
-- [ ] 사용자에게 동작 회귀 테스트 요청 후, `feat/mvp` 브랜치 정리(사용자가 머지).
+- [x] 전체 테스트: `npx vitest run` → 모두 PASS. `npm run lint` → 통과. `npx tsc --noEmit` → 에러 없음.
+- [x] 골든패스 수동 점검: 로그 업로드 → 후보 채택 → 점 → 두 번 클릭 연결 → 새로고침해도 저장됨(localStorage) → JSON 내보내기/가져오기.
+- [x] 사용자에게 동작 회귀 테스트 요청 후, `feat/mvp` 브랜치 정리(사용자가 머지).
 
 ## 다음(roadmap, 별도 계획)
 
