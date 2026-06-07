@@ -36,7 +36,7 @@ export function GraphView({
         id: node.id,
         label: node.label,
         topic: node.topic,
-        weak: isIsolated(allEdges, node.id),
+        isolated: isIsolated(allEdges, node.id),
       })),
       links: edges.map((edge) => ({ id: edge.id, source: edge.source, target: edge.target })),
     }),
@@ -61,7 +61,7 @@ export function GraphView({
   return (
     <ForceGraph2D
       graphData={data}
-      nodeColor={(node: any) => (node.isolated ? '#9ca3af' : colorOf(node.topic))} // 고립·약연결 = 회색 강조
+      nodeColor={(node: any) => (node.isolated ? '#9ca3af' : colorOf(node.topic))} // 고립 = 회색 강조
       nodeVal={(node: any) => (node.isolated ? 6 : 4)} // + 크게
       onNodeClick={onNodeClick}
       linkColor={() => '#ffffff'}
