@@ -115,7 +115,7 @@
 
 ## 7. 현재 상태 / 다음 단계 ★
 
-> **2026-06-07 기준: MVP 구현 계획 11개 Task 전부 완료 → 🎉 MVP 완성.** 추출 → 채택 → 그래프 시각화 → 검색/필터 → 저장/백업까지 끝까지 동작. 다음 단계 = 로드맵 1순위 **배포**.
+> **2026-06-07 기준: MVP 완성 + 🚀 배포 완료** (https://knowledge-graph-lyart.vercel.app). 추출 → 채택 → 그래프 → 검색/필터 → 저장/백업 동작, 라이브 서비스 중. 다음 단계 = 로드맵 2번 **DB+인증**.
 
 ### 완료
 - [x] **설계 전부**: spec(`docs/specs/2026-05-29-knowledge-graph-design.md`) · 구현 계획(`docs/plans/2026-05-29-knowledge-graph-mvp.md`, 11개) · **ADR 0001~0009**
@@ -128,9 +128,10 @@
 - [x] **Task 10 검색 + 주제 필터**(SearchFilter + `filterGraph`·`uniqueTopics` **TDD 둘째 사이클**, PR #23) · 주제 입력칸 라벨 UX(#21, PR #24)
 - [x] **Task 11 페이지 컨트롤**(Controls: JSON 내보내기/가져오기 + 점 삭제, PR #26) → **MVP 완성**
 - [x] **로드맵 재배치**(DB·인증 7→2, **ADR 0010**, PR #28) · **고립 강조 degree 0으로 수정**(#29, PR #30 — Kimi가 키 불일치 버그 발견)
+- [x] **배포**(Vercel + GitHub 자동 배포, PR #35·이슈 #33): 예시 그래프 시드(첫 방문, `example-graph.ts` + `hasStoredGraph` TDD) + 비우기 버튼. 라이브 https://knowledge-graph-lyart.vercel.app — `/api/velog` serverless 동작을 실제 호출로 확인.
 
-### 다음 단계 = 배포 (로드맵 1순위) ★
-- **MVP 완성.** 다음 마일스톤은 [roadmap.md](roadmap.md) **1번 배포**(예시 데이터로 호스팅) → 그다음 **2번 DB+인증**(ADR 0010으로 7→2 앞당김).
+### 다음 단계 = DB + 인증 (로드맵 2번) ★
+- **MVP + 배포 완료.** 다음 마일스톤은 [roadmap.md](roadmap.md) **2번 DB+인증**(ADR 0010으로 7→2 앞당김) — 큰 작업(스키마·API·인증·보안·비용), 착수 시 새 ADR 후보.
 - 흐름은 동일: 이슈 생성 → 브랜치(`타입/N-설명`) → 구현(컴포넌트는 **사용자가 직접 타이핑**, Claude는 제시만) → tsc/테스트 → 커밋·푸시 → PR → Kimi 리뷰 → **사용자가 직접 머지**.
 - ⚠️ 캔버스(GraphView)는 자동 테스트 불가 → **수동 검수 때 "실제로 그렇게 보이나"까지** 확인할 것 (이번에 키 불일치로 강조가 꺼진 '고장난 빌드'를 헛검수한 적 있음, #29).
 
