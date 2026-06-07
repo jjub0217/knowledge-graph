@@ -221,7 +221,7 @@ git commit -m "feat: 그래프 비우기 버튼 (#33)"
 
 **Files:** (없음 — 검증·PR)
 
-- [ ] **Step 1: 전체 게이트**
+- [x] **Step 1: 전체 게이트**
 
 Run:
 ```bash
@@ -230,14 +230,14 @@ npx vitest run         # 모두 PASS
 npm run lint           # 에러 0
 ```
 
-- [ ] **Step 2: 푸시 + PR**
+- [x] **Step 2: 푸시 + PR**
 
 ```bash
 git push -u origin feat/33-deploy
 gh pr create --base main --head feat/33-deploy --title "feat: 배포 준비 — 예시 데이터 시드 + 비우기 (#33)" --body "Closes #33 (배포 코드 부분). Vercel 연결은 머지 후 Task 6에서 사용자가 직접."
 ```
 
-- [ ] **Step 3: Kimi 리뷰 → 사용자 머지**
+- [x] **Step 3: Kimi 리뷰 → 사용자 머지**
 
 ---
 
