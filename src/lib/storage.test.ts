@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { saveGraph, loadGraph, exportJSON, importJSON } from './storage'
+import { saveGraph, loadGraph, exportJSON, importJSON, hasStoredGraph } from './storage'
 import type { Graph } from './types'
 
 // 테스트마다 쓸 견본 그래프 (점 1개, 연결선 0개)
@@ -20,5 +20,13 @@ describe('storage', () => {
 
   it('export → import 왕복', () => {
     expect(importJSON(exportJSON(sample))).toEqual(sample)
+  })
+
+  it('저장 전엔 hasStoredGraph가 false', () => {
+    expect(hasStoredGraph()).toBe(false)
+  })
+  it('저장 후엔 hasStoredGraph가 true', () => {
+    saveGraph(sample)
+    expect(hasStoredGraph()).toBe(true)
   })
 })

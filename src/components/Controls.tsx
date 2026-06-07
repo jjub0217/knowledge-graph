@@ -5,6 +5,11 @@ import { exportJSON, importJSON } from '@/lib/storage'
 export function Controls() {
   const { nodes, edges, setAll, removeNode } = useGraph()
 
+  // 그래프 전체 비우기 (되돌릴 수 없으니 confirm 한 번)
+  function clearAll() {
+    if (confirm('그래프를 모두 비울까요? 되돌릴 수 없어요.')) setAll([], [])
+  }
+
   // JSON 내보내기: 현재 그래프를 파일로 다운로드
   function download() {
     const blob = new Blob([exportJSON({ nodes, edges })], { type: 'application/json' })
@@ -33,6 +38,9 @@ export function Controls() {
 
   return (
     <div className="flex items-center gap-2">
+      <button className="border px-2" onClick={clearAll}>
+        비우기
+      </button>
       <button className="border px-2" onClick={download}>
         JSON 내보내기
       </button>
