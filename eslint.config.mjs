@@ -10,8 +10,15 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   globalIgnores([
-    '.next/**', 'out/**', 'build/**', 'next-env.d.ts',
-    'node_modules', '*.config.js', '*.config.ts', '*.config.mjs', 'public',
+    '.next/**',
+    'out/**',
+    'build/**',
+    'next-env.d.ts',
+    'node_modules',
+    '*.config.js',
+    '*.config.ts',
+    '*.config.mjs',
+    'public',
   ]),
   {
     files: ['**/*.{ts,tsx}'],
@@ -39,15 +46,19 @@ const eslintConfig = defineConfig([
       'react/jsx-fragments': 'warn',
       'react/jsx-no-useless-fragment': 'warn',
       // 잡음 방지
-      'no-console': 'warn',
+      // console.error/warn(의도된 로깅)은 허용, console.log는  경고
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-debugger': 'warn',
       'no-duplicate-imports': 'warn',
       // 팀 규칙
       '@typescript-eslint/consistent-type-definitions': ['error', 'interface'], // 타입은 interface로
-      'react/function-component-definition': ['error', {
-        namedComponents: 'function-declaration', // 이름 있는 컴포넌트 = function 선언
-        unnamedComponents: 'arrow-function',
-      }],
+      'react/function-component-definition': [
+        'error',
+        {
+          namedComponents: 'function-declaration', // 이름 있는 컴포넌트 = function 선언
+          unnamedComponents: 'arrow-function',
+        },
+      ],
     },
   },
   prettier, // 항상 마지막: 포맷 충돌 규칙 끔
