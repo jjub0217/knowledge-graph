@@ -14,9 +14,21 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
   // RLS가 자기 행만 보이게 하지만, 명시적으로 컬럼만 고른다.
-  const { data: nodeRows } = await supabase.from('nodes').select('id,label,topic')
-  const { data: edgeRows } = await supabase.from('edges').select('id,source,target')
-  return NextResponse.json(rowsToGraph(nodeRows ?? [], edgeRows ?? []))
+  // const { data: nodeRows } = await supabase.from('nodes').select('id,label,topic')
+  // const { data: edgeRows } = await supabase.from('edges').select('id,source,target')
+
+  // RLS가 자기 행만 보이게 하지만, 명시적으로 컬럼만 고른다.
+  // 두 조회를 병렬로(순차면 지연 2배). RLS가 자기 행만 보이게 한다.
+  const [nodesResult, edgesResult] = await Promise.all([
+    supabase.from('nodes').select('id,label,topic'),
+    supabase.from('edges').select('id,source,target'),
+  ])
+  // 조회 에러(DB 장애·RLS 등)를 빈 그래프로 숨기지 않고 500으로 알린다.
+  if (nodesResult.error || edgesResult.error) {
+    return NextResponse.json({ error: '그래프 불러오기 실패' }, { status: 500 })
+  }
+  // return NextResponse.json(rowsToGraph(nodeRows ?? [], edgeRows ?? []))
+  return NextResponse.json(rowsToGraph(nodesResult.data ?? [], edgesResult.data ?? []))
 }
 
 // 내 그래프 통째 저장(교체)
