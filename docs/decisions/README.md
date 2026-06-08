@@ -16,6 +16,7 @@
 | [0008](0008-code-review-tool.md) | 코드리뷰 도구 = Kimi(K2.6)·OpenRouter·커스텀 워크플로 | 채택 | 2026-06-01 |
 | [0009](0009-extractor-noise-strategy.md) | 추출 노이즈 대응 = 펜스 제외 확정·개념 판별 필터 보류 | 채택 | 2026-06-04 |
 | [0010](0010-db-auth-priority.md) | DB 저장·인증 도입 시점을 앞당김 (로드맵 7→2) | 채택 | 2026-06-05 |
+| [0011](0011-db-auth-architecture.md) | DB+인증 아키텍처 = Supabase 하이브리드·정규화·쿠키 세션 | 채택 | 2026-06-08 |
 
 ---
 
