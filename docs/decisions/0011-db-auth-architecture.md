@@ -59,8 +59,9 @@
 ## 결과 (Consequences)
 
 - 저장 계층(`storage.ts`)이 **동기 → 비동기(async)** 로 바뀌고, 로그인 여부로 경로가 갈린다. `hasStoredGraph()`와 localStorage 그래프 저장은 제거된다(`exportJSON`/`importJSON`은 유지).
-- 새 부품: Supabase 프로젝트(DB + RLS), `/api/graph` 라우트, `/auth/callback` 라우트, supabase 클라이언트(브라우저·서버), 로그인/로그아웃 UI, 행↔그래프 변환 순수 함수.
-- 변환 함수는 순수 함수라 **TDD 셋째 사이클** 대상이 된다. 인증·라우트·OAuth는 자동 테스트가 닿기 어려워 수동 검수로 검증한다.
+- 새 부품: Supabase 프로젝트(DB + RLS + `replace_graph` 함수), `/api/graph` 라우트, `/auth/callback` 라우트, supabase 클라이언트(브라우저·서버), 로그인/로그아웃 UI, `rowsToGraph` 순수 함수.
+- **저장은 Postgres 함수(RPC) `replace_graph`로 한 묶음 처리**(전부 되거나 전부 취소) — 개별 호출로 나눌 때의 "반쪽 저장"을 막는다. 이는 설계 PR(#39)의 Kimi 코드리뷰에서 나온 지적을 반영한 것이다. 같은 리뷰로 미들웨어 matcher에서 `/api` 제외, 클라이언트 분기는 `getSession`(로컬) 사용으로 중복 세션 확인을 줄였다.
+- 불러오기 변환(`rowsToGraph`)은 순수 함수라 **TDD 셋째 사이클** 대상이 된다. 인증·라우트·OAuth는 자동 테스트가 닿기 어려워 수동 검수로 검증한다.
 - 시크릿(Supabase 키)·소셜 앱 키 발급·Vercel 환경변수 등록은 사용자가 직접 수행한다. service_role 키는 쓰지 않는다.
 - 이 결정은 [ADR 0003](0003-framework.md)의 프레임워크 선택(Next.js)을 유지하며, MVP 저장으로서의 localStorage가 타당했다는 판단도 뒤집지 않는다. 바뀌는 것은 저장 계층의 구현뿐이다.
 - 상세 청사진은 [설계 문서](../specs/2026-06-08-db-auth-design.md)에 있다.
