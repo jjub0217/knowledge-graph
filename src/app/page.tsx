@@ -86,17 +86,20 @@ export default function Home() {
     function refresh() {
       loadGraph()
         .then((graph) => setAll(graph.nodes, graph.edges))
-        .catch(() => {}) // 실패 시 화면 유지
+        .catch((error) => console.error('그래프 불러오기 실패', error))
     }
     refresh() // 첫 로드
-    const { data: sub } = supabase.auth.onAuthStateChange(() => refresh()) // 로그인/로그아웃 시 다시
+    // 로그인/로그아웃에서만 다시 불러옴 (토큰 갱신 등은 무시 — 불필요 재호출·덮어쓰기 방지)
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') refresh()
+    })
     return () => sub.subscription.unsubscribe()
   }, [setAll])
 
   // 변경 시: 디바운스(0.6초) 후 저장. 비로그인이면 saveGraph가 no-op.
   useEffect(() => {
     const timer = setTimeout(() => {
-      saveGraph({ nodes, edges }).catch(() => {})
+      saveGraph({ nodes, edges }).catch((error) => console.error('그래프 저장 실패', error))
     }, 600)
     return () => clearTimeout(timer)
   }, [nodes, edges])
