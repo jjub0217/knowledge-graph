@@ -10,6 +10,7 @@ import { CandidateReview } from '@/components/CandidateReview'
 import { GraphView } from '@/components/GraphView'
 import { SearchFilter } from '@/components/SearchFilter'
 import { Controls } from '@/components/Controls'
+import { AuthButton } from '@/components/AuthButton'
 
 export default function Home() {
   const [candidates, setCandidates] = useState<Candidate[]>([])
@@ -80,6 +81,11 @@ export default function Home() {
 
   return (
     <main className="space-y-4 p-4">
+      {/* 로그인 */}
+      <div className="flex justify-end">
+        <AuthButton />
+      </div>
+
       {/* 0. 페이지 컨트롤: 내보내기/가져오기 + 점 삭제 */}
       <Controls />
 
