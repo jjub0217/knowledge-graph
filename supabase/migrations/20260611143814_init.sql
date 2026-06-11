@@ -40,3 +40,10 @@ begin
     from jsonb_to_recordset(p_edges) as x(id text, source text, target text);
 end;
 $$ language plpgsql security definer;
+
+
+-- 권한: authenticated 역할이 표를 읽고 쓸 수 있게 (행 단위 제한은 위 RLS가 또 건다)
+grant select, insert, update, delete on public.nodes to authenticated;
+grant select, insert, update, delete on public.edges to authenticated;
+-- 통째 저장 함수(replace_graph) 호출 권한
+grant execute on function public.replace_graph(jsonb, jsonb) to authenticated;
