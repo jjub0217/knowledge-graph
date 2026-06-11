@@ -26,11 +26,11 @@
 **Files:**
 - Commit: `docs/specs/2026-06-11-dev-prod-db-separation-design.md`, `docs/decisions/0012-dev-prod-db-separation.md`, `docs/decisions/README.md`
 
-- [ ] **Step 1: 이슈 + 브랜치 생성**
+- [x] **Step 1: 이슈 + 브랜치 생성** — 이슈 #47, 브랜치 `chore/47-db-env-split`
 
 `/create-issue`로 "개발/운영 DB 분리(roadmap 2-후속)" 이슈와 작업 브랜치(`chore/N-db-env-split`)를 만든다. 이후 커밋에 `(#N)`을 붙인다.
 
-- [ ] **Step 2: 설계 문서 커밋**
+- [x] **Step 2: 설계 문서 커밋** — `d7e8491`(spec·ADR 0012·README·plan 4개)
 
 ```bash
 git add docs/specs/2026-06-11-dev-prod-db-separation-design.md docs/decisions/0012-dev-prod-db-separation.md docs/decisions/README.md
@@ -43,20 +43,20 @@ git commit -m "docs: 개발/운영 db 분리 설계 + adr 0012 (#N)"
 
 **Files:** 없음(설치) · 사용자 머신
 
-- [ ] **Step 1: Docker Desktop 설치·실행** (사용자)
+- [x] **Step 1: Docker Desktop 설치·실행** (사용자)
 
 [docker.com](https://www.docker.com/products/docker-desktop/)에서 Docker Desktop 설치 후 **실행**(메뉴바 고래 아이콘이 떠 있어야 함). 로컬 스택이 Docker 위에서 돌기 때문.
 
-- [ ] **Step 2: Docker 확인**
+- [x] **Step 2: Docker 확인** — `Docker version 29.4.3`, `docker ps` 정상
 
 Run: `docker --version`
 Expected: `Docker version ...` 출력 (실행 중이면 `docker ps`도 에러 없이 빈 목록)
 
-- [ ] **Step 3: Supabase CLI 설치** (사용자)
+- [x] **Step 3: Supabase CLI 설치** (사용자)
 
 Run: `brew install supabase/tap/supabase`
 
-- [ ] **Step 4: CLI 확인**
+- [x] **Step 4: CLI 확인** — `supabase 2.106.0`
 
 Run: `supabase --version`
 Expected: 버전 숫자 출력 (예 `2.x.x`)
@@ -70,17 +70,17 @@ Expected: 버전 숫자 출력 (예 `2.x.x`)
 **Files:**
 - Create: `supabase/config.toml`(CLI 생성), `supabase/.gitignore`(CLI 생성), `supabase/migrations/<timestamp>_init.sql`
 
-- [ ] **Step 1: 프로젝트 초기화**
+- [x] **Step 1: 프로젝트 초기화**
 
 Run: `supabase init`
 Expected: `supabase/` 폴더 + `config.toml` 생성. ("Generate VS Code settings?" 등 물으면 N으로 충분.)
 
-- [ ] **Step 2: baseline 마이그레이션 파일 만들기**
+- [x] **Step 2: baseline 마이그레이션 파일 만들기** — `supabase/migrations/20260611143814_init.sql`
 
 Run: `supabase migration new init`
 Expected: `supabase/migrations/<timestamp>_init.sql` 빈 파일 생성. 경로를 메모.
 
-- [ ] **Step 3: 스키마 SQL 작성**
+- [x] **Step 3: 스키마 SQL 작성** — 파일 내용 확인 완료(표 2 + RLS 2 + replace_graph)
 
 방금 생긴 `supabase/migrations/<timestamp>_init.sql`에 아래를 그대로 적는다(운영 대시보드에 적용된 것과 동일 — db-auth 플랜 Task 1 Step 3 출처):
 
@@ -129,7 +129,7 @@ end;
 $$ language plpgsql security definer;
 ```
 
-- [ ] **Step 4: 커밋**
+- [x] **Step 4: 커밋** — `3de53d9`
 
 ```bash
 git add supabase/config.toml supabase/.gitignore supabase/migrations
