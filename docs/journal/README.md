@@ -295,3 +295,28 @@
 - **Task 8 마무리**: 배포본 로그인·저장 왕복 재검수 · Supabase Table Editor에서 실제 행이 쌓였는지 증거 확인 · 멀티기기(다른 브라우저/계정 같음) 확인 · Kakao 제공자 추가.
 - **Task 9(후속)**: dev/prod DB 분리 — 현재 로컬과 운영이 같은 Supabase DB를 본다.
 - **블로그 후보**: ① "토큰 저장: localStorage vs 쿠키"(초안 작성함) / ② "serverless·배포 후 환경변수 — `NEXT_PUBLIC_`은 빌드 때 박힌다" / ③ "큰 PR을 쪼개는 이유 — AI 코드리뷰의 토큰 한도".
+
+---
+
+## 2026-06-12 (금) — 개발/운영 DB 분리(Task 9): Supabase CLI + 로컬 Docker 스택
+
+### 한 일
+- **dev/prod DB 분리**: 로컬과 운영이 같은 Supabase 프로젝트를 보던 걸, **로컬 = Docker 스택(dev) / 기존 클라우드 = 운영(prod)** 으로 나눔. 운영·Vercel은 안 건드림. (설계 `docs/specs/2026-06-11-dev-prod-db-separation-design.md`, **ADR 0012**, 계획 `docs/plans/2026-06-11-dev-prod-db-separation.md`)
+- **Supabase CLI 도입**: `supabase init`(설정 파일 `config.toml` 생성) → `supabase start`(Docker로 로컬 Postgres·Auth·Studio 한 벌 기동) → `.env.local`을 로컬 스택 주소로 교체. 운영은 그대로.
+- **스키마를 코드로(마이그레이션)**: 지금까지 표·RLS·`replace_graph` 함수가 운영 대시보드에만 있던 걸, **baseline 마이그레이션**(현재 스키마를 통째로 담은 첫 SQL 파일)으로 옮겨 git에 남김. 로컬은 이 파일로 채워짐(provision = 빈 DB에 표를 만들어 쓸 수 있게 갖춤).
+- **로컬 Google 로그인**: 운영에 쓰던 Google OAuth 클라이언트를 재사용. `config.toml`의 `[auth.external.google]`에 client_id·secret을 **env() 치환**으로만 두고(시크릿은 `.env`에, git 제외), 로컬 콜백을 Google Console에 등록. 앱 코드는 변경 없음(`redirectTo`가 `location.origin` 기반이라 로컬에선 자동으로 localhost).
+- **분리 증명(마커 검증)**: 로컬에서 만든 점("리뷰 UX"·"비용")이 **로컬 DB엔 있고 운영 클라우드엔 없음**을 직접 확인 → 로컬 테스트가 운영을 오염시키지 않음.
+
+### 막힌 점 / 결정
+- **(디버깅) 권한 누락 → 500**: 로컬에서 로그인 후 `GET /api/graph`가 500(`그래프 불러오기 실패`). 원인은 **`authenticated` 역할에 `SELECT` 권한이 없어서**(`information_schema.role_table_grants` 조회로 확인 — `REFERENCES/TRIGGER/TRUNCATE`만 있고 SELECT 없음, `set role authenticated; select…` → `permission denied for table nodes`). **운영 대시보드는 표 만들 때 grant를 자동으로** 해주지만, **raw 마이그레이션 SQL엔 그 grant가 없어서** 로컬엔 권한이 안 붙음. → 마이그레이션에 `grant select,insert,update,delete on nodes/edges to authenticated` + `grant execute on replace_graph` 추가. **교훈: 스키마를 코드로 옮길 때 대시보드의 '숨은 자동 처리'까지 명시해야 한다.** (저장 PUT은 `replace_graph`가 `security definer`(함수 소유자 권한으로 실행)라 grant 없이도 200이 떠서, "GET만 500 / PUT은 200" 패턴이 진단 단서였음.)
+- **(함정) `supabase db reset`은 로컬 사용자도 지운다 → 401**: grant 고친 뒤 `db reset`을 돌리자 이번엔 401. reset이 로컬 DB를 통째로 비우면서 `auth.users`(로그인 사용자)도 지워, 브라우저의 옛 세션 쿠키가 "없는 사용자"를 가리킴. → **다시 로그인**하면 해결. (db reset 뒤엔 항상 재로그인, 로컬 한정.)
+- **(잠복 버그 발견) 운영 Site URL = localhost**: 분리 후 **운영 회귀 테스트** 중, 배포본 로그인이 `localhost:3000/?code=…`로 튕김. 원인은 **운영 Supabase의 Site URL이 새 프로젝트 기본값 `localhost:3000`** 이었던 것. OAuth에서 **Site URL / Redirect URLs**는 로그인 후 "돌려보내도 되는 주소 허용 목록"(allow-list — 모르는 주소로 보내 인증 코드가 탈취되는 걸 막는 보안 장치)인데, 앱이 넘긴 배포 콜백이 목록에 없으면 Site URL(localhost)로 떨어진 것. → **운영 Site URL을 vercel 도메인으로 바꾸고, 배포 콜백을 Redirect URLs에 등록.** **분리 작업이 그동안 잠복해 있던 운영 설정 버그를 드러낸** 사례.
+
+### 과정 / 워크플로
+- brainstorming → spec → **ADR 0012** → writing-plans → 구현(이슈 #47, 브랜치 `chore/47-db-env-split`). 코드·SQL은 사용자가 직접 타이핑, config·문서는 Claude가 작성.
+- 인프라·설정 작업이라 자동 테스트가 없고, **마커 검증(로컬엔 있고 운영엔 없음)이 진짜 게이트**. 디버깅은 추측 대신 **psql로 권한·행을 직접 조회**해 원인을 좁힘.
+
+### 다음
+- **Task 7**: PR(#47) → Kimi 리뷰 → 사용자 머지 → HANDOFF "Task 9 완료" 갱신.
+- (별개) db-auth 마일스톤 Task 8의 Kakao 제공자 등 잔여 항목.
+- **블로그 후보**: ① "로컬 Supabase(Docker)로 dev/prod DB 분리하기" / ② "마이그레이션이 놓치는 것 — 대시보드가 몰래 해주던 grant" / ③ "OAuth Site URL·Redirect URLs가 뭐고 왜 localhost로 튕기나".
