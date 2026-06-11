@@ -115,7 +115,7 @@
 
 ## 7. 현재 상태 / 다음 단계 ★
 
-> **2026-06-07 기준: MVP 완성 + 🚀 배포 완료** (https://knowledge-graph-lyart.vercel.app). 추출 → 채택 → 그래프 → 검색/필터 → 저장/백업 동작, 라이브 서비스 중. 다음 단계 = 로드맵 2번 **DB+인증**.
+> **2026-06-08 기준: DB+인증 마일스톤 거의 완료 — 로그인하면 그래프가 Supabase 서버 DB에 저장·복원(멀티기기)** (https://knowledge-graph-lyart.vercel.app). Task 1~7 구현·머지(PR #41~#45, 이슈 #38), 브라우저 검수 완료. **남은 것 = Task 8 마무리**(배포본 검수·DB 행 증거·멀티기기·Kakao 제공자). 다음 새 마일스톤 = **Task 9 dev/prod DB 분리**.
 
 ### 완료
 - [x] **설계 전부**: spec(`docs/specs/2026-05-29-knowledge-graph-design.md`) · 구현 계획(`docs/plans/2026-05-29-knowledge-graph-mvp.md`, 11개) · **ADR 0001~0009**
@@ -129,20 +129,37 @@
 - [x] **Task 11 페이지 컨트롤**(Controls: JSON 내보내기/가져오기 + 점 삭제, PR #26) → **MVP 완성**
 - [x] **로드맵 재배치**(DB·인증 7→2, **ADR 0010**, PR #28) · **고립 강조 degree 0으로 수정**(#29, PR #30 — Kimi가 키 불일치 버그 발견)
 - [x] **배포**(Vercel + GitHub 자동 배포, PR #35·이슈 #33): 예시 그래프 시드(첫 방문, `example-graph.ts` + `hasStoredGraph` TDD) + 비우기 버튼. 라이브 https://knowledge-graph-lyart.vercel.app — `/api/velog` serverless 동작을 실제 호출로 확인.
+- [x] **DB + 인증 (로드맵 2, 이슈 #38) — Task 1~7**: 하이브리드(Supabase + 직접 쓴 `/api/graph` 라우트) · 정규화 스키마(`nodes`·`edges` + `user_id` FK + RLS) · 쿠키 세션(`@supabase/ssr`) · Postgres RPC `replace_graph`로 원자적 저장(반쪽 저장 차단) · **Google 로그인** · `storage.ts` 비동기 전환(로그인→서버 / 비로그인→예시, `hasStoredGraph`·localStorage 제거) · `page.tsx` 통합(async 로드 + auth 상태 구독 + 디바운스 저장). **ADR 0011** · spec/plan `2026-06-08-db-auth` · `rowsToGraph` **TDD 셋째 사이클**. **Task별 작은 PR #39·#41~#45**(큰 PR은 Kimi 빈 응답 → 분할). 브라우저로 로그인·저장·복원 검수 완료. Vercel 환경변수(`NEXT_PUBLIC_SUPABASE_URL`·`...PUBLISHABLE_KEY`) 등록.
 
-### 다음 단계 = DB + 인증 (로드맵 2번) ★
-- **MVP + 배포 완료.** 다음 마일스톤은 [roadmap.md](roadmap.md) **2번 DB+인증**(ADR 0010으로 7→2 앞당김) — 큰 작업(스키마·API·인증·보안·비용), 착수 시 새 ADR 후보.
-- 흐름은 동일: 이슈 생성 → 브랜치(`타입/N-설명`) → 구현(컴포넌트는 **사용자가 직접 타이핑**, Claude는 제시만) → tsc/테스트 → 커밋·푸시 → PR → Kimi 리뷰 → **사용자가 직접 머지**.
-- ⚠️ 캔버스(GraphView)는 자동 테스트 불가 → **수동 검수 때 "실제로 그렇게 보이나"까지** 확인할 것 (이번에 키 불일치로 강조가 꺼진 '고장난 빌드'를 헛검수한 적 있음, #29).
+### 다음 단계 ★
+
+**A. Task 8 마무리 — DB+인증 검수** (`docs/plans/2026-06-08-db-auth.md` Task 8)
+- 라이브 사이트에서 Google 로그인 → 저장·복원 재확인 (Vercel env 이미 등록).
+- Supabase **Table Editor**에서 내 `nodes`·`edges` 행 증거 확인.
+- **멀티기기**(다른 브라우저 같은 계정) → 같은 그래프.
+- **Kakao 제공자 추가** — Google로 흐름 검증됐으니 Kakao Developers 앱 발급 + Supabase Providers 등록(AuthButton에 Kakao 버튼은 이미 있음, 지금 누르면 에러가 정상).
+- ⚠️ **빌드 저널 2026-06-08 항목이 main 작업트리에 미커밋** — docs 브랜치로 커밋 필요.
+
+**B. Task 9 — dev/prod DB 분리 (새 마일스톤, 설계 미착수)** ★
+> ℹ️ 여기서 "Task 9"는 MVP 플랜(`docs/plans/2026-05-29-knowledge-graph-mvp.md`)의 Task 9(그래프 화면, 완료)와 **다른**, 이 새 마일스톤에 임시로 붙인 별명이다. 별도 플랜을 만들면 그 안에서 Task 1부터 새로 매긴다.
+- 지금 로컬·운영이 **같은 Supabase DB** 하나 → 로컬 테스트가 운영 DB를 오염시킴. dev/prod **Supabase 프로젝트 분리** 필요.
+- **reelbox 선례 확인됨**(`~/Desktop/reelbox`): 별도 Supabase 프로젝트 + `supabase/config.toml`(`project_id`) + `SUPABASE_SERVICE_ROLE_KEY` 사용 구조. (reelbox 작업 *히스토리*는 다른 기기(맥북)라 이 맥미니엔 없을 수 있음 — 프로젝트 파일은 있음)
+- 새 설계 결정이라 **ADR 제안 + 설계 합의 → 계획**으로 진행.
+
+**공통 흐름**: 이슈 생성 → 브랜치(`타입/N-설명`) → 구현(코드는 **사용자가 직접 타이핑**, Claude는 제시만) → tsc/테스트 → 커밋·푸시 → PR → Kimi 리뷰 → **사용자가 직접 머지**.
+- ⚠️ **큰 작업은 처음부터 작은 PR로 분할**(Kimi 빈 응답·토큰 방지 — 이번에 PR #40을 #41·#42·#43으로 쪼갬).
+- ⚠️ 자동 테스트(특히 인증·DB·캔버스)는 mock이라 "통과 ≠ 동작" → **브라우저 수동 검수가 진짜 게이트**.
+- ⚠️ 새 라우트는 **폴더 = URL** 주의 — `api/`에 잘못 두면 주소 어긋나 404(이번에 콜백이 그랬음).
 
 ### 미뤄둔 것 / 후속 (별도 이슈 후보)
 - **추출 노이즈 2단계**(문장형 제목·경로 등 "개념 아님" 거르기) — ADR 0009에서 보류(사람 확정이 흡수). 필요해지면 별도 이슈.
-- **Kimi 워크플로 견고화** — PR #17에서 리뷰가 빈 응답으로 2회 실패(추정: `max_tokens:4000`을 추론이 소진). `max_tokens` 상향 또는 content 비면 `reasoning` 폴백.
+- **Kimi 워크플로 견고화** — 큰 PR diff(예: 421줄)에서 리뷰 빈 응답 재현(추론이 `max_tokens:4000` 소진). **현재 우회 = PR을 Task별로 작게 분할**. 근본 해결은 `max_tokens` 상향 또는 content 비면 `reasoning` 폴백(후속).
 - **GraphView 개선**(다음 반복): 연결 시작점(pending) 시각 표시 없음.
 - **채택 후 주제(색) 변경**(#22, 대기) · 고립 강조 **B안**(색=주제 / 고립=별도 채널인 테두리·크기) 검토 여지.
 
 ### 기술 스택 (확정 — ADR 참조)
 - Next.js 16 · React 19 · TypeScript 5 · Tailwind 4 · Vitest 4 · **react-force-graph-2d**(2D 전용) · zustand · @testing-library/react(RTL) (ADR 0003·0005·0006).
+- **DB/인증**: **Supabase**(Postgres + Auth) · `@supabase/ssr`(쿠키 세션) · 정규화 스키마 + RLS + Postgres RPC. 환경변수 `NEXT_PUBLIC_SUPABASE_URL`·`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`(Supabase 신규 키명, 옛 anon). (ADR 0011)
 
 ---
 
@@ -154,8 +171,8 @@ cd ~/Desktop/knowledge-graph
 claude
 ```
 이제 프로젝트 `CLAUDE.md`가 자동 로드되며 "세션 시작 시 docs/HANDOFF.md 먼저 읽어라"라고 지시함. 따라서 첫 메시지는 간단히:
-> **"이어서 진행해줘"** (또는 "구현 계획 Task 10부터 시작해줘")
+> **"이어서 진행해줘"**
 
-Claude는 CLAUDE.md 지시에 따라 이 문서를 읽고 "7. 다음 단계"의 **Task 10(검색 + 주제 필터)**부터 시작한다.
+Claude는 CLAUDE.md 지시에 따라 이 문서를 읽고 "7. 다음 단계"의 **A. Task 8 마무리**(DB+인증 검수·Kakao) 또는 **B. Task 9**(dev/prod DB 분리, 설계부터)를 사용자와 정해 시작한다.
 
-(Task 1~9 완료·머지됨. 구현은 작업 브랜치 `feat/N-설명` → PR → 사용자 머지.)
+(MVP + 배포 + DB+인증 Task 1~7 완료·머지됨. 구현은 작업 브랜치 `feat/N-설명` → 작은 PR → Kimi 리뷰 → 사용자 머지.)
