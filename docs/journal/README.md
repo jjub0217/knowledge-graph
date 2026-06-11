@@ -269,3 +269,29 @@
 - 로드맵 **2번 DB + 인증**(ADR 0010) — 큰 작업(스키마·API·인증·보안·비용). 착수 시 새 ADR(DB·인증 방식)부터. 교체 지점은 `storage.ts`.
 - 후속 이슈: #22(채택 후 주제 변경), #34(네이티브 대화상자 → 인앱 UI).
 - **블로그 후보**: "serverless가 뭐고 왜 '배포 후 확인'이 필요한가" / "배포 ≠ 서버 저장 — localStorage 앱을 배포해도 데이터는 브라우저에 남는다".
+
+---
+
+## 2026-06-08 (월) — DB 저장 + 인증 마일스톤(로드맵 2번) 착수·구현 (Task 1~7 완료, Task 8 진행 중)
+
+### 한 일
+- **설계 → ADR 0011**: 하이브리드 아키텍처 확정 — 브라우저는 직접 쓴 Next.js `/api/graph` 라우트를 거치고, 라우트가 쿠키 세션으로 사용자를 확인해 Supabase에서 그 사람 행만 조회·저장. supabase-js만 사용(ORM 없음), 정규화 스키마(`nodes`·`edges` 표 + `user_id` FK + RLS), 세션은 쿠키(`@supabase/ssr`), 비로그인 localStorage 저장은 제거(로그인해야 저장·비로그인은 예시만), 1차 제공자 Google + Kakao(Kakao는 후속), Naver·Facebook 제외. (`docs/decisions/0011-db-auth-architecture.md`, `docs/specs/2026-06-08-db-auth-design.md`, `docs/plans/2026-06-08-db-auth.md`)
+- **저장은 Postgres 함수(RPC `replace_graph`)로 한 묶음 처리**(전부 되거나 전부 취소) — 삭제+삽입이 중간에 끊겨도 "반쪽 저장"이 안 남게. 설계 PR(#39)의 Kimi 코드리뷰 지적을 반영한 것. 같은 리뷰로 미들웨어 matcher에서 `/api` 제외(라우트가 스스로 인증 → 중복 세션 확인 회피), 클라이언트 분기는 `getSession`(로컬) 사용으로 정리.
+- **구현**: @supabase/ssr 브라우저·서버 클라이언트 + 세션 갱신 미들웨어(Task 2, PR #41) / `rowsToGraph` 순수 함수 — **TDD 셋째 사이클**(Task 3, PR #42) / `/api/graph` GET·PUT 라우트(Task 4, PR #43) / OAuth 콜백 라우트 + `AuthButton`(Task 5, PR #44) / `storage.ts` 비동기 전환 + 로그인 분기(로그인→서버, 비로그인→예시, `getSession`으로 로컬 판별) + `page.tsx` 통합(async 로드 + auth 상태 구독 + 디바운스 0.6초 저장)(Task 6~7, PR #45).
+
+### 막힌 점 / 결정
+- **(디버깅) 로그인 콜백 404**: App Router는 폴더 경로가 곧 URL인데 콜백 라우트를 `app/api/auth/callback`에 둬서 실제 주소가 `/api/auth/callback`이 됨(코드는 `/auth/callback`을 기대). → `app/auth/callback`으로 옮겨 해결. 처음엔 계정·DB 문제로 오해했다가 **마커(어느 경로로 들어오는지)를 확인해** 원인을 폴더 위치로 좁힘.
+- **(배포) Vercel 빌드 에러 `@supabase/ssr: URL and API key required`**: Vercel에 환경변수(`NEXT_PUBLIC_SUPABASE_URL`·`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`)를 등록하지 않은 채 페이지를 미리 그릴(prerender) 때 `createClient`가 빈 값으로 터짐. → Vercel에 환경변수 등록(Preview 포함) 후 재배포로 해결. **`NEXT_PUBLIC_` 값은 빌드 시점에 코드에 박히므로** 빌드 환경에 없으면 실행 때 받을 수 없다.
+- **(개념) Supabase 새 키 체계**: anon → **Publishable key**(`sb_publishable_…`), service_role → **Secret key**(`sb_secret_…`)로 이름이 바뀜. 환경변수명을 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`로 맞춤. Secret 키는 쓰지 않음.
+- **(워크플로) Kimi 코드리뷰 빈 응답**: 큰 PR diff(예: 421줄)에서 추론 모델이 토큰 한도(max_tokens 4000)를 추론에 다 써 리뷰 본문이 빈 채로 나옴. → **PR을 Task별 작은 PR로 분할**하는 전략 채택(합쳐 올렸던 PR #40을 #41·#42·#43으로 쪼갬). 워크플로 max_tokens 상향은 후속 후보.
+- **(설계) storage와 page의 결합**: `storage`의 저장·불러오기를 async로 바꾸면 `page`의 동기 호출이 깨져, 둘을 같은 PR(#45)로 묶어야 함.
+- **(관행) 커밋 타입**: TDD로 함수를 새로 추가하면 `feat: …(TDD)`(기능 추가), `test:`는 테스트 전용 변경에만. (PR #42에서 `test:`로 잘못 쓴 것을 `feat:`로 정정)
+
+### 과정 / 워크플로
+- 설계 합의 → ADR → 구현 계획 → **Task별 작은 PR**(이슈 #38, PR #41~#45). 흐름: 이슈 → 브랜치 → 커밋·푸시 → PR → Kimi 리뷰 → 사용자 머지.
+- 인증·라우트·OAuth·쿠키는 자동 테스트가 닿기 어려워, **브라우저로 실제 로그인 → 저장 → 새로고침 유지를 수동 검수**하는 게 진짜 게이트(자동 테스트는 mock이라 서버 영속성은 못 덮음 — "테스트 통과 ≠ 동작").
+
+### 다음
+- **Task 8 마무리**: 배포본 로그인·저장 왕복 재검수 · Supabase Table Editor에서 실제 행이 쌓였는지 증거 확인 · 멀티기기(다른 브라우저/계정 같음) 확인 · Kakao 제공자 추가.
+- **Task 9(후속)**: dev/prod DB 분리 — 현재 로컬과 운영이 같은 Supabase DB를 본다.
+- **블로그 후보**: ① "토큰 저장: localStorage vs 쿠키"(초안 작성함) / ② "serverless·배포 후 환경변수 — `NEXT_PUBLIC_`은 빌드 때 박힌다" / ③ "큰 PR을 쪼개는 이유 — AI 코드리뷰의 토큰 한도".
