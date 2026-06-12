@@ -320,3 +320,25 @@
 - **Task 7**: PR(#47) → Kimi 리뷰 → 사용자 머지 → HANDOFF "Task 9 완료" 갱신.
 - (별개) db-auth 마일스톤 Task 8의 Kakao 제공자 등 잔여 항목.
 - **블로그 후보**: ① "로컬 Supabase(Docker)로 dev/prod DB 분리하기" / ② "마이그레이션이 놓치는 것 — 대시보드가 몰래 해주던 grant" / ③ "OAuth Site URL·Redirect URLs가 뭐고 왜 localhost로 튕기나".
+
+---
+
+## 2026-06-12 (금) — Kakao 로그인 추가: 카카오 비즈앱 정책 장벽 뚫기
+
+### 한 일
+- Google로 검증된 OAuth 흐름에 **Kakao 제공자**를 추가(로컬 dev 스택 기준, 이슈 #50). 화면 쪽은 이미 `AuthButton`에 버튼·`login('kakao')`이 있었고 `signInWithOAuth`는 제공자 값만 바꾸면 됨 → **실제 코드 변경은 `config.toml`에 `[auth.external.kakao]` 한 블록뿐**.
+- 로컬 시크릿(REST API 키·Client Secret)은 `.env`에 두고 `config.toml`은 `env()` 치환으로만 참조(git에 비밀 안 올림). Google과 같은 패턴.
+
+### 막힌 점 / 결정
+- **(정책 장벽) Supabase가 `account_email`을 기본 scope로 강제** → 카카오 `KOE205`(설정하지 않은 동의항목을 요청). 그런데 `account_email`은 **개인 개발자 계정에선 선택 동의로도 못 켜고 비즈앱 전환이 필수**(카카오 정책). 코드에서 scope를 빼보려 했지만 Supabase는 기본 scope에 **덧붙이기만** 해서(요청 URL에 `profile_nickname`이 두 번 찍힌 게 단서) 뺄 수 없었음. → **개인 개발자 비즈앱 전환**으로 방향 결정(사업자 없이 본인인증 + 카카오비즈니스 약관동의, 단 **앱 아이콘 등록**이 선행 조건).
+- **(에러 코드로 원인 좁히기)** 비즈앱 전환 뒤에도 동의항목을 하나씩 맞춰야 했음. 카카오 에러 화면의 "왜 에러가 발생하나요?"가 정확한 단서를 줌 — ① `profile_image` 동의항목 누락(KOE205) → 추가, ② **리다이렉트 URI가 비어 있던** 것(KOE006) → `http://127.0.0.1:54321/auth/v1/callback` 등록. 카카오는 리다이렉트 URI를 "카카오 로그인" 메뉴가 아니라 **앱 설정 → 플랫폼 키(REST API 키 수정)** 화면에 등록하는 게 함정.
+- **(결정) 별도 ADR 없이 저널로**: Kakao 추가는 ADR 0011(인증 결정)의 실행이고, 비즈앱 전환은 새 설계가 아니라 외부 정책 대응이라 ADR감이 아님.
+
+### 검증
+- 브라우저 OAuth 3단계(카카오 인증 302 → Supabase 콜백 302 → 앱 콜백 307) 성공.
+- 로컬 DB `auth.users`를 직접 조회해 **`kakao` 사용자 생성 + 이메일 채워짐** 확인(값은 안 찍고 존재 여부만). 화면에 이메일 표시까지 확인 → 처음 우려했던 "이메일 없는 제공자라 버튼이 안 바뀌는 표시 함정"은 비즈앱 전환으로 이메일을 받게 돼 자연히 해소.
+
+### 다음
+- 이슈 #50 체크박스 갱신 → PR(코드 변경은 `config.toml` 하나) → Kimi 리뷰 → 사용자 머지.
+- **운영(prod) Kakao는 후속**: Supabase 운영 대시보드 Providers + 운영 콜백/Site URL 등록(이번은 로컬 dev만).
+- **블로그 후보**: ① "Supabase + 카카오 로그인 — `account_email` 강제와 비즈앱 전환 장벽" / ② "카카오 OAuth 에러 코드로 원인 좁히기(KOE205 동의항목 → KOE006 리다이렉트 URI)".
