@@ -5,8 +5,9 @@
 
 ## 프로젝트
 
-- 학습한 개념을 노드·엣지로 시각화하는 **학습 지식 그래프** (Obsidian 그래프뷰의 학습 흐름 특화).
+- 흩어진 학습 자료(`.md`·velog 글)에서 개념을 자동 추출해 **문서·개념 이분 그래프**로 자동 연결, "내 자료들이 어떤 개념으로 이어지는지" 발견하게 하는 **학습 지식 그래프**. (Obsidian과 달리 `[[ ]]`를 안 써도 연결이 뜸.)
 - 동기: 취업 포폴 + 도구/워크플로우 학습 + 내가 쓸 실용 도구 + 멘토 "새 프로젝트 해와라" 과제 (4가지 다).
+- ⚠️ **2026-06-12 피벗([ADR 0013](docs/decisions/0013-bipartite-model-pivot.md))**: 수동 엣지 → 이분 그래프 자동 멤버십. 설계 = [spec 2026-06-12](docs/specs/2026-06-12-bipartite-graph-design.md).
 
 ## 메타 요구사항 — 면접 설명력 (1급 관심사)
 
@@ -31,12 +32,12 @@
 
 ## 현재 단계
 
-- **설계·구현 계획 완료** (brainstorming → spec → plan). 다음은 **구현**.
-- **다음**: 구현 계획 `docs/plans/2026-05-29-knowledge-graph-mvp.md`의 Task 1부터(작업 브랜치 `feat/mvp`). 상세는 `docs/HANDOFF.md` 7번.
+- 옛 MVP + 배포 + DB·인증 + dev/prod 분리 **완료**. **2026-06-12 이분 그래프로 피벗**(ADR 0013) → 새 spec 작성 완료.
+- **다음**: C-MVP **구현 계획(plan)** 작성 → 구현. 상세·최신 상태는 항상 `docs/HANDOFF.md` 7번 참조.
 
 ## 기술 스택 (확정 — ADR 참조)
 
-- Next.js 16 · React 19 · TypeScript 5 · Tailwind 4 · Vitest 4 · react-force-graph · zustand. (근거: ADR 0003·0005·0006)
+- Next.js 16 · React 19 · TypeScript 5 · Tailwind 4 · Vitest 4 · react-force-graph-2d · zustand · Supabase(DB·인증). 테스트: Vitest(유닛) + RTL(컴포넌트) + **Playwright(E2E·canvas 게이트, C-MVP 신규)**. (근거: ADR 0003·0005·0006·0011·0013)
 
 ## git
 
