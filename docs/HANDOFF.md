@@ -115,7 +115,9 @@
 
 ## 7. 현재 상태 / 다음 단계 ★
 
-> **2026-06-12 기준: dev/prod DB 분리 완료** — 로컬 = Supabase CLI + Docker 스택(dev) / 운영 = 기존 클라우드(prod). 로컬 테스트가 운영을 오염시키지 않음(마커로 증명). (ADR 0012 · 이슈 #47 · PR #48). 그 전 **DB+인증 마일스톤도 완료**(로그인→서버 저장·복원·멀티기기, https://knowledge-graph-lyart.vercel.app, 이슈 #38). **다음 새 마일스톤 = 로드맵 3(velog 추출 정교화)** / Kakao 제공자(선택).
+> **2026-06-12 기준: 이분 그래프로 피벗 — 설계 + 구현 계획(plan) 완료, 구현 차례.** 수동 엣지 모델이 "발견"이라는 핵심 가치와 어긋난다는 판단 → **문서·개념 이분 그래프 + 자동 멤버십 엣지**로 전환(ADR 0013·0014). 개념 노드=전부 자동+정규화, 수동 엣지 제거, LLM은 퀴즈 자리. 새 설계 = spec `docs/specs/2026-06-12-bipartite-graph-design.md` + plan `docs/plans/2026-06-12-bipartite-graph.md`. **다음 = C-MVP 구현 (plan Task 1부터).**
+>
+> (그 전까지: 옛 MVP + 배포 + DB·인증 + dev/prod DB 분리 완료. 로컬 = Supabase CLI + Docker(dev) / 운영 = 클라우드(prod). 라이브 https://knowledge-graph-lyart.vercel.app. ADR 0010~0012, 이슈 #38·#47.)
 
 ### 완료
 - [x] **설계 전부**: spec(`docs/specs/2026-05-29-knowledge-graph-design.md`) · 구현 계획(`docs/plans/2026-05-29-knowledge-graph-mvp.md`, 11개) · **ADR 0001~0009**
@@ -134,11 +136,14 @@
 
 ### 다음 단계 ★
 
-**직전 완료**: DB+인증(이슈 #38) + **dev/prod DB 분리**(이슈 #47 · ADR 0012 · PR #48). 로컬은 Supabase CLI + Docker 스택, 운영은 클라우드로 분리됨.
+**직전 완료**: **이분 그래프 피벗 설계** — ADR 0013(피벗)·0014(문서 집합 저장) 채택 + 새 spec `2026-06-12-bipartite-graph-design.md` + plan `2026-06-12-bipartite-graph.md`. 0001·0002는 "일부 대체됨(→0013)" 표기. README·roadmap·CLAUDE.md 갱신 완료.
 
-**다음 새 마일스톤 후보 (로드맵 순):**
-- **로드맵 3 — velog 추출 정교화**: 줄글에서 핵심 개념만 더 잘 뽑기 + '개념 아님' 판별 필터(ADR 0009에서 보류한 2단계 재검토).
-- (선택) **Kakao 제공자 추가** — Google로 흐름 검증됨. Kakao Developers 앱 발급 + Supabase Providers(운영) + `config.toml`(로컬) 등록. (AuthButton에 버튼은 이미 있음, 지금 누르면 에러가 정상.)
+**다음 = C-MVP 구현 (plan `docs/plans/2026-06-12-bipartite-graph.md` Task 1부터).** 핵심 범위(spec §3): 다중 입력 누적 → 개념 자동 추출 → **표기 정규화 + 그래프 빌드(이분, 개념 병합, 멤버십 엣지)** → 문서/개념 구분 렌더 → 검색/필터 → DB 저장(문서 집합, 스키마 마이그레이션 필요).
+- 신규 순수 모듈 `normalize`·`graph-builder` = **TDD 대상**. 그래프 렌더 게이트 = **Playwright(골든패스+canvas 스모크) + 수동**(spec §9).
+- 그래프 = **문서 집합의 파생**(문서 빼면 그 개념·연결도 사라짐). 수동 엣지·주제 색·CandidateReview는 제거.
+- 보류(후속 ADR 후보): 개념 별칭②·임베딩 / 퀴즈 LLM(로드맵 4) / 노이즈 심하면 "2+문서 공유 개념만"으로 좁히기 / Kakao 제공자.
+
+**C-MVP 이후 순서(2026-06-12 조정)**: 추출 정교화(로드맵 3) → **UI 구축(Claude 디자인 도구 claude.ai/design, 로드맵 3.5 — 첫 사용)** → 능동 학습(퀴즈 등, 로드맵 4~6). 즉 퀴즈(2차 가치) 앞에 거친 UI를 제대로 된 비주얼로 만드는 단계를 끼움.
 
 **공통 흐름**: 이슈 생성 → 브랜치(`타입/N-설명`) → 구현(코드는 **사용자가 직접 타이핑**, Claude는 제시만) → tsc/테스트 → 커밋·푸시 → PR → Kimi 리뷰 → **사용자가 직접 머지**.
 - ⚠️ **큰 작업은 처음부터 작은 PR로 분할**(Kimi 빈 응답·토큰 방지).
@@ -153,7 +158,7 @@
 - **채택 후 주제(색) 변경**(#22, 대기) · 고립 강조 **B안**(색=주제 / 고립=별도 채널인 테두리·크기) 검토 여지.
 
 ### 기술 스택 (확정 — ADR 참조)
-- Next.js 16 · React 19 · TypeScript 5 · Tailwind 4 · Vitest 4 · **react-force-graph-2d**(2D 전용) · zustand · @testing-library/react(RTL) (ADR 0003·0005·0006).
+- Next.js 16 · React 19 · TypeScript 5 · Tailwind 4 · Vitest 4 · **react-force-graph-2d**(2D 전용) · zustand · @testing-library/react(RTL) · **Playwright(E2E·canvas 게이트 — C-MVP 신규)** (ADR 0003·0005·0006·0013).
 - **DB/인증**: **Supabase**(Postgres + Auth) · `@supabase/ssr`(쿠키 세션) · 정규화 스키마 + RLS + Postgres RPC. 환경변수 `NEXT_PUBLIC_SUPABASE_URL`·`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`(Supabase 신규 키명, 옛 anon). (ADR 0011)
 - **개발 환경 분리**: dev = **Supabase CLI 로컬 Docker 스택**(`supabase/config.toml`·`migrations/`, `supabase start`) / prod = 클라우드. 로컬 시크릿은 `.env`, 로컬 스택 주소는 `.env.local`. (ADR 0012)
 
@@ -169,6 +174,6 @@ claude
 이제 프로젝트 `CLAUDE.md`가 자동 로드되며 "세션 시작 시 docs/HANDOFF.md 먼저 읽어라"라고 지시함. 따라서 첫 메시지는 간단히:
 > **"이어서 진행해줘"**
 
-Claude는 CLAUDE.md 지시에 따라 이 문서를 읽고 "7. 다음 단계"의 **A. Task 8 마무리**(DB+인증 검수·Kakao) 또는 **B. Task 9**(dev/prod DB 분리, 설계부터)를 사용자와 정해 시작한다.
+Claude는 CLAUDE.md 지시에 따라 이 문서를 읽고 "7. 다음 단계"대로 **C-MVP(이분 그래프) 구현을 plan `docs/plans/2026-06-12-bipartite-graph.md` Task 1(타입)부터** 시작한다.
 
-(MVP + 배포 + DB+인증 Task 1~7 완료·머지됨. 구현은 작업 브랜치 `feat/N-설명` → 작은 PR → Kimi 리뷰 → 사용자 머지.)
+(옛 MVP + 배포 + DB·인증 + dev/prod 분리 완료·머지됨. 2026-06-12 이분 그래프 피벗 — 설계·plan 완료. 구현은 작업 브랜치 `feat/N-설명` → 작은 PR → Kimi 리뷰 → 사용자 머지.)
