@@ -136,7 +136,7 @@
 
 ### 다음 단계 ★
 
-**직전 완료**: **이분 그래프 피벗 설계** — ADR 0013(피벗)·0014(문서 집합 저장) 채택 + 새 spec `2026-06-12-bipartite-graph-design.md` + plan `2026-06-12-bipartite-graph.md`. 0001·0002는 "일부 대체됨(→0013)" 표기. README·roadmap·CLAUDE.md 갱신 완료.
+**직전 완료**: **이분 그래프 피벗 설계 + 문서화 머지** — ADR 0013(피벗)·0014(문서 집합 저장) 채택 + 새 spec `2026-06-12-bipartite-graph-design.md` + plan `2026-06-12-bipartite-graph.md`. 0001·0002는 "일부 대체됨(→0013)" 표기. README·roadmap·CLAUDE.md 갱신 완료. **이슈 #53을 4개 PR(#54 결정 → #55 설계 → #56 계획 → #57 반영)로 분할해 머지 완료**(한 이슈 → 작은 PR 분할 규칙 적용).
 
 **다음 = C-MVP 구현 (plan `docs/plans/2026-06-12-bipartite-graph.md` Task 1부터).** 핵심 범위(spec §3): 다중 입력 누적 → 개념 자동 추출 → **표기 정규화 + 그래프 빌드(이분, 개념 병합, 멤버십 엣지)** → 문서/개념 구분 렌더 → 검색/필터 → DB 저장(문서 집합, 스키마 마이그레이션 필요).
 - 신규 순수 모듈 `normalize`·`graph-builder` = **TDD 대상**. 그래프 렌더 게이트 = **Playwright(골든패스+canvas 스모크) + 수동**(spec §9).
